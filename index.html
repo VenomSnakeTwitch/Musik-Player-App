@@ -974,7 +974,7 @@ function drawRing() {
   const centerY = canvas.height / 2;
 
   // Logo deutlich größer machen (ca. 45–50 % der kleineren Seite)
-  const logoBase = Math.min(canvas.width, canvas.height) * 0.48;  // ← hier größer (vorher 0.32)
+  cconst logoBase = Math.min(canvas.width, canvas.height) * (canvas.width < 600 ? 0.42 : 0.48);  // ← hier größer (vorher 0.32)
   const logoSize = logoBase;
 
   if (logoImg.complete) {

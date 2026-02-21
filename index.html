@@ -466,17 +466,16 @@ button:disabled, button:disabled:hover {
       <p>Metal Gear 2 Solid Snake Level3 Warning Remix</p>
       <p>Metal Gear 2 Solid Snake Reprieve of The Doctor Remix</p>
       <p>Takin' On The Shagohod Remake</p>
-      </p>Metal Gear 2 Solid Snake Freqency 140.85.mp3</p>
+      <p>Metal Gear 2 Solid Snake Freqency 140.85.mp3</p>
     </div>
     <div class="infoColumn">
       <h3>Bald Erscheinende Songs</h3>
-      <p></p>
       <p>Weitere Projekte in Planung...</p>
     </div>
   </div>
 </div>
 
-<!-- VISUALIZER OVERLAY – nur noch RING -->
+<!-- VISUALIZER OVERLAY – nur RING -->
 <div id="visualizerOverlay">
   <div class="viz-header">
     <h2>VENOM VISUALIZER</h2>
@@ -565,7 +564,7 @@ const downloadBtn = document.getElementById("downloadBtn");
 const loopBtn = document.getElementById("loopBtn");
 const radioToggle = document.getElementById("radioToggle");
 
-// VISUALIZER – nur noch RING
+// VISUALIZER – nur RING
 const visualizerOverlay = document.getElementById('visualizerOverlay');
 const visualizerBtn = document.getElementById('visualizerBtn');
 const closeVisualizer = document.getElementById('closeVisualizer');
@@ -711,7 +710,7 @@ function resumeAudioContext() {
   if (audioContext.state === 'suspended') audioContext.resume();
 }
 
-// Play/Pause etc. (wie vorher)
+// Play/Pause etc.
 function togglePlay() {
   resumeAudioContext();
   if (audio.paused || audio.ended) {
@@ -844,7 +843,7 @@ if (savedTheme) {
 document.getElementById('themeBtn').onclick = toggleTheme;
 
 // ────────────────────────────────────────────────────────────────
-// VISUALIZER – nur noch RING
+// VISUALIZER – RING Modus (Logo & Ring deutlich größer)
 // ────────────────────────────────────────────────────────────────
 
 function resizeCanvas() {
@@ -854,51 +853,62 @@ function resizeCanvas() {
 
 function drawRing() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+
   const centerX = canvas.width / 2;
   const centerY = canvas.height / 2;
-  const logoBase = Math.min(canvas.width, canvas.height) * 0.48;
+
+  // Logo deutlich größer
+  const logoBase = Math.min(canvas.width, canvas.height) * 0.68; // war 0.48 → jetzt 0.68
   const logoSize = logoBase;
+
   if (logoImg.complete) {
-    ctx.shadowBlur = 40;
-    ctx.shadowColor = 'rgba(0,255,255,0.7)';
+    ctx.shadowBlur = 60;               // stärkerer Glow
+    ctx.shadowColor = 'rgba(0,255,255,0.85)';
     ctx.drawImage(logoImg, centerX - logoSize/2, centerY - logoSize/2, logoSize, logoSize);
   }
-  const ringRadius = logoSize * 0.58;
-  const ringThickness = 8 + Math.max(...fadeDataArray) / 255 * 6;
+
+  // Ring um das Logo deutlich größer
+  const ringRadius = logoSize * 0.78;   // war 0.58 → jetzt 0.78
+  const ringThickness = 12 + Math.max(...fadeDataArray) / 255 * 10;  // dickerer Ring
+
   ctx.beginPath();
   ctx.arc(centerX, centerY, ringRadius, 0, Math.PI * 2);
   ctx.lineWidth = ringThickness;
-  ctx.strokeStyle = `hsla(200, 100%, 70%, 0.45)`;
-  ctx.shadowBlur = 35;
-  ctx.shadowColor = `rgba(0, 255, 255, 0.7)`;
+  ctx.strokeStyle = `hsla(200, 100%, 70%, 0.55)`;
+  ctx.shadowBlur = 50;
+  ctx.shadowColor = `rgba(0, 255, 255, 0.85)`;
   ctx.stroke();
-  const rayCount = 96;
+
+  // Mehr Strahlen für epischen Look
+  const rayCount = 120;  // war 96 → jetzt 120
   for (let i = 0; i < rayCount; i++) {
     const angle = (i / rayCount) * Math.PI * 2;
     const mirroredIndex = Math.min(i, rayCount - 1 - i);
     const freqIndex = Math.floor((mirroredIndex / rayCount) * bufferLength);
     const amp = fadeDataArray[freqIndex] / 255;
-    const rayLength = amp * (ringRadius * 0.65);
+    const rayLength = amp * (ringRadius * 0.75);  // etwas längere Strahlen
+
     const innerX = centerX + Math.cos(angle) * ringRadius;
     const innerY = centerY + Math.sin(angle) * ringRadius;
     const outerX = centerX + Math.cos(angle) * (ringRadius + rayLength);
     const outerY = centerY + Math.sin(angle) * (ringRadius + rayLength);
-    const hue = 180 + (i * 3.75) % 180;
-    ctx.strokeStyle = `hsla(${hue}, 100%, ${60 + amp * 40}%, ${0.75 + amp * 0.25})`;
-    ctx.lineWidth = 2.5 + amp * 10;
-    ctx.shadowBlur = 20 + amp * 40;
-    ctx.shadowColor = `hsla(${hue}, 100%, 80%, 0.8)`;
+
+    const hue = 180 + (i * 3) % 180;  // etwas flüssigere Farbverlauf
+    ctx.strokeStyle = `hsla(${hue}, 100%, ${60 + amp * 40}%, ${0.8 + amp * 0.2})`;
+    ctx.lineWidth = 3 + amp * 12;
+    ctx.shadowBlur = 30 + amp * 50;
+    ctx.shadowColor = `hsla(${hue}, 100%, 85%, 0.9)`;
+
     ctx.beginPath();
     ctx.moveTo(innerX, innerY);
     ctx.lineTo(outerX, outerY);
     ctx.stroke();
   }
-  ctx.restore();
 }
 
 function drawVisualizer() {
   animationId = requestAnimationFrame(drawVisualizer);
-  ctx.clearRect(0, 0, canvas.width, canvas.height); // immer clear für RING
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   if (audio.paused || audio.ended || audio.currentTime === 0) {
     for (let i = 0; i < bufferLength; i++) {
       fadeDataArray[i] *= 0.94;

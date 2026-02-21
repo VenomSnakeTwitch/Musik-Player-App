@@ -1018,39 +1018,28 @@ function drawRing() {
 }
 
 function drawWaveform() {
-  const midY = canvas.height / 2;
+  const baseY = canvas.height; // Start ganz unten
   ctx.beginPath();
+  ctx.moveTo(0, baseY);
 
-  // Obere Welle – von ganz links bis ganz rechts
-  ctx.moveTo(0, midY);
   const sliceWidth = canvas.width / bufferLength;
   let x = 0;
 
   for (let i = 0; i < bufferLength; i++) {
     const v = fadeDataArray[i] / 128.0;
-    const y = midY - (v * canvas.height * 0.45);
+    const y = baseY - (v * canvas.height * 0.92); // wächst stark nach oben
     ctx.lineTo(x, y);
     x += sliceWidth;
   }
 
-  ctx.lineTo(canvas.width, midY);
-
-  // Untere gespiegelte Welle – symmetrisch von rechts nach links
-  x = canvas.width;
-  for (let i = bufferLength - 1; i >= 0; i--) {
-    const v = fadeDataArray[i] / 128.0;
-    const y = midY + (v * canvas.height * 0.45);
-    ctx.lineTo(x, y);
-    x -= sliceWidth;
-  }
-
-  ctx.lineTo(0, midY);
+  ctx.lineTo(canvas.width, baseY);
+  ctx.lineTo(0, baseY);
   ctx.closePath();
 
   const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-  gradient.addColorStop(0, 'rgba(0, 255, 255, 0.8)');
-  gradient.addColorStop(0.5, 'rgba(145, 70, 255, 0.6)');
-  gradient.addColorStop(1, 'rgba(0, 255, 255, 0.3)');
+  gradient.addColorStop(0, 'rgba(0, 255, 255, 0.9)');
+  gradient.addColorStop(0.5, 'rgba(145, 70, 255, 0.7)');
+  gradient.addColorStop(1, 'rgba(0, 255, 255, 0.2)');
 
   ctx.fillStyle = gradient;
   ctx.fill();
@@ -1063,7 +1052,7 @@ function drawWaveform() {
 }
 
 function drawBars() {
-  const barWidth = canvas.width / bufferLength; // volle Breite ohne Gap
+  const barWidth = canvas.width / bufferLength;
   let x = 0;
 
   for (let i = 0; i < bufferLength; i++) {
@@ -1074,7 +1063,7 @@ function drawBars() {
     gradient.addColorStop(1, `hsl(${190 + i * 1.2}, 100%, 35%)`);
 
     ctx.fillStyle = gradient;
-    ctx.fillRect(x, canvas.height - height, barWidth, height); // kein Abzug → Rand zu Rand
+    ctx.fillRect(x, canvas.height - height, barWidth, height);
 
     x += barWidth;
   }
@@ -1089,8 +1078,8 @@ function drawLightning() {
 
   const numBolts = 4 + Math.floor(bass * 14);
   for (let i = 0; i < numBolts; i++) {
-    let x = Math.random() * canvas.width; // volle Breite
-    let y = Math.random() * canvas.height * 0.3;
+    let x = Math.random() * canvas.width;
+    let y = canvas.height * 0.6 + Math.random() * canvas.height * 0.4; // Start eher unten
 
     ctx.strokeStyle = `hsl(195, 100%, ${55 + bass * 35}%)`;
     ctx.lineWidth = 2 + bass * 12;
@@ -1102,7 +1091,7 @@ function drawLightning() {
 
     const steps = 12 + Math.floor(bass * 10);
     for (let s = 1; s < steps; s++) {
-      y += canvas.height / steps * (0.6 + Math.random() * 0.7);
+      y -= canvas.height / steps * (0.5 + Math.random() * 0.6); // nach oben bewegen
       x += (Math.random() - 0.5) * (120 + bass * 280);
       x = Math.max(0, Math.min(canvas.width, x));
       ctx.lineTo(x, y);

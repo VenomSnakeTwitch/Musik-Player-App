@@ -23,14 +23,16 @@
 :root {
   --accent: #00ffff;
   --accent-dark: #9146ff;
-  --bg-overlay: rgba(0,0,50,0.85);
+  --bg-overlay: rgba(0,0,50,0.92);
   --text-main: #f0f0ff;
   --bg-light: rgba(245,245,255,0.88);
   --text-light: #1a1a40;
+  --glow: 0 0 15px rgba(0, 255, 255, 0.6);
 }
 [data-theme="light"] {
   --bg-overlay: var(--bg-light);
   --text-main: var(--text-light);
+  --glow: 0 0 12px rgba(145, 70, 255, 0.5);
 }
 body {
   margin: 0;
@@ -232,7 +234,7 @@ button:disabled, button:disabled:hover {
   border-color: #ffdd00;
   box-shadow: 0 0 12px #ffdd00aa;
 }
-/* VISUALIZER */
+/* VISUALIZER – moderner Player-Stil */
 #visualizerOverlay {
   position: fixed;
   inset: 0;
@@ -307,61 +309,56 @@ button:disabled, button:disabled:hover {
   margin-top: 22px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   background: rgba(0,0,40,0.92);
-  padding: 10px 18px;
-  border-radius: 50px;
-  border: 2px solid #00ffff55;
-  box-shadow: 0 0 40px rgba(0,255,255,0.3);
+  padding: 12px 24px;
+  border-radius: 16px;
+  border: 2px solid rgba(0,255,255,0.3);
+  box-shadow: 0 0 40px rgba(0,255,255,0.2);
   flex-wrap: wrap;
   justify-content: center;
+  backdrop-filter: blur(10px);
 }
 .viz-btn {
-  width: 48px;
-  height: 48px;
-  font-size: 1.65rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0,0,60,0.8);
-  border: 3px solid #00ffff;
+  padding: 12px 20px;
+  font-size: 1.3rem;
+  background: linear-gradient(145deg, rgba(0,255,255,0.15), rgba(145,70,255,0.15));
+  border: 1px solid rgba(0,255,255,0.5);
   color: #fff;
-  border-radius: 50%;
+  border-radius: 12px;
   cursor: pointer;
-  transition: all 0.25s;
+  transition: all 0.3s ease;
+  min-width: 70px;
+  text-shadow: 0 0 8px rgba(0,255,255,0.6);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
 }
-#vizPlayPauseBtn {
-  width: 62px;
-  height: 62px;
-  font-size: 2.15rem;
+.viz-btn:hover:not(:disabled) {
+  background: linear-gradient(145deg, rgba(0,255,255,0.35), rgba(145,70,255,0.35));
+  border-color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0,255,255,0.4);
+}
+.viz-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  filter: grayscale(70%);
 }
 #vizDownloadBtn {
-  width: 62px;
-  height: 62px;
-  font-size: 1.8rem;
-  background: rgba(0,0,60,0.8);
-  border: 3px solid #00ffff;
-  color: #fff;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: all 0.25s;
+  background: linear-gradient(145deg, rgba(0,255,255,0.2), rgba(145,70,255,0.2));
+  border: 1px solid rgba(0,255,255,0.6);
 }
 #vizDownloadBtn:hover:not(:disabled) {
-  background: rgba(145,70,255,0.6);
-  border-color: #ffffff;
-}
-#vizDownloadBtn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
+  background: linear-gradient(145deg, rgba(0,255,255,0.45), rgba(145,70,255,0.45));
 }
 .viz-select {
-  padding: 11px 18px;
-  font-size: 0.98rem;
+  padding: 12px 20px;
+  font-size: 1rem;
   background: rgba(0,0,60,0.85);
-  border: 2px solid #00ffff;
+  border: 1px solid rgba(0,255,255,0.5);
   color: #fff;
-  border-radius: 14px;
-  min-width: 220px;
+  border-radius: 12px;
+  min-width: 240px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
 }
 #vizVersion {
   position: absolute;
@@ -430,6 +427,7 @@ button:disabled, button:disabled:hover {
     flex-wrap: wrap;
     gap: 8px;
     justify-content: center;
+    padding: 12px;
   }
 }
 @media (max-width: 480px) {
@@ -558,7 +556,7 @@ button:disabled, button:disabled:hover {
   <div id="vizControls">
     <button onclick="prevSong()" class="viz-btn">⏮</button>
     <button id="vizPlayPauseBtn" onclick="togglePlay()" class="viz-btn">▶</button>
-    <button id="vizDownloadBtn" class="viz-btn" disabled>↓</button> <!-- NEU: Download im Visualizer -->
+    <button id="vizDownloadBtn" class="viz-btn" disabled>Download</button>
     <button onclick="nextSong()" class="viz-btn">⏭</button>
     <select id="vizSongSelect" onchange="selectSongFromViz()" class="viz-select"></select>
   </div>
@@ -639,7 +637,7 @@ const canvas = document.getElementById('visualizerCanvas');
 const ctx = canvas.getContext('2d');
 const modeBtns = document.querySelectorAll('.mode-btn');
 const vizPlayPauseBtn = document.getElementById('vizPlayPauseBtn');
-const vizDownloadBtn = document.getElementById('vizDownloadBtn'); // NEU
+const vizDownloadBtn = document.getElementById('vizDownloadBtn');
 const vizSongSelect = document.getElementById('vizSongSelect');
 
 let audioContext = null;
@@ -671,7 +669,7 @@ function updateVizDownloadBtn() {
   }
 }
 
-// Lautstärke-Synchronisation (vorheriger Code bleibt)
+// Lautstärke-Synchronisation
 function syncVolumeSliderFromSystem() {
   const currentVolume = audio.volume;
   if (Math.abs(currentVolume - parseFloat(volumeSlider.value)) > 0.01) {
@@ -741,7 +739,7 @@ function togglePlay() {
     audio.play().then(() => {
       playPauseBtn.textContent = "⏸ Pause";
       vizPlayPauseBtn.textContent = "⏸";
-      updateVizDownloadBtn(); // NEU
+      updateVizDownloadBtn();
     }).catch(e => {
       console.error("Play-Fehler:", e);
     });
@@ -749,7 +747,7 @@ function togglePlay() {
     audio.pause();
     playPauseBtn.textContent = "▶ Play";
     vizPlayPauseBtn.textContent = "▶";
-    updateVizDownloadBtn(); // NEU
+    updateVizDownloadBtn();
   }
 }
 
@@ -764,7 +762,7 @@ function loadSong(index) {
   downloadBtn.href = url;
   downloadBtn.setAttribute("download", fileName);
   document.getElementById("currentSong").textContent = "▶ " + songSelect.options[index].text;
-  updateVizDownloadBtn(); // NEU: Visualizer-Download aktualisieren
+  updateVizDownloadBtn();
 }
 
 function selectSong() {
@@ -799,7 +797,7 @@ function stopSong() {
   audio.currentTime = 0;
   playPauseBtn.textContent = "▶ Play";
   vizPlayPauseBtn.textContent = "▶";
-  updateVizDownloadBtn(); // NEU
+  updateVizDownloadBtn();
 }
 
 function toggleRadioMode() {
@@ -1019,7 +1017,7 @@ function startVisualizer() {
   resumeAudioContext();
   resizeCanvas();
   if (!animationId) drawVisualizer();
-  updateVizDownloadBtn(); // NEU: beim Öffnen aktualisieren
+  updateVizDownloadBtn();
 }
 
 function stopVisualizer() {
@@ -1080,7 +1078,6 @@ window.addEventListener('load', () => {
   populateVizSongSelect();
   resizeCanvas();
   volumeSlider.value = 0.5;
-  // Initialer Sync nach Laden
   setTimeout(syncVolumeSliderFromSystem, 500);
 });
 </script>

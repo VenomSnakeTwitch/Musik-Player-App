@@ -234,7 +234,7 @@ button:disabled, button:disabled:hover {
   border-color: #ffdd00;
   box-shadow: 0 0 12px #ffdd00aa;
 }
-/* VISUALIZER – moderner Player-Stil */
+/* VISUALIZER */
 #visualizerOverlay {
   position: fixed;
   inset: 0;
@@ -253,8 +253,8 @@ button:disabled, button:disabled:hover {
   border-radius: 24px;
   box-shadow: 0 0 60px #00ffff88, 0 0 120px #9146ff55;
   background: #00000033 center/cover no-repeat;
-  max-width: 96vw;
-  max-height: 60vh;
+  max-width: 98vw;
+  max-height: 65vh;
   width: 100%;
   height: auto;
   object-fit: contain;
@@ -691,7 +691,7 @@ let vizMode = 2;
 const logoImg = new Image();
 logoImg.src = "https://raw.githubusercontent.com/VenomSnakeTwitch/VenomSnake_Twitch-Webseite/main/DogVenomsnakeLogo.png";
 
-// Hintergrund-Upload & Reset – NUR auf Canvas
+// Hintergrund nur auf Canvas
 vizBgUploadBtn.addEventListener('click', () => {
   bgFileInput.click();
 });
@@ -734,7 +734,7 @@ window.addEventListener('load', () => {
   }
 });
 
-// Download-Button im Visualizer
+// Download-Button
 function updateVizDownloadBtn() {
   if (audio.src && !audio.paused && !audio.ended) {
     vizDownloadBtn.disabled = false;
@@ -752,7 +752,7 @@ function updateVizDownloadBtn() {
   }
 }
 
-// Vollbild-Button
+// Vollbild
 vizFullscreenBtn.addEventListener('click', () => {
   if (!document.fullscreenElement) {
     document.documentElement.requestFullscreen().catch(err => {
@@ -763,12 +763,11 @@ vizFullscreenBtn.addEventListener('click', () => {
   }
 });
 
-// Lautstärke-Synchronisation
+// Lautstärke Sync
 function syncVolumeSliderFromSystem() {
   const currentVolume = audio.volume;
   if (Math.abs(currentVolume - parseFloat(volumeSlider.value)) > 0.01) {
     volumeSlider.value = currentVolume;
-    console.log("Lautstärke synchronisiert von System auf:", currentVolume);
   }
 }
 
@@ -834,9 +833,7 @@ function togglePlay() {
       playPauseBtn.textContent = "⏸ Pause";
       vizPlayPauseBtn.textContent = "⏸";
       updateVizDownloadBtn();
-    }).catch(e => {
-      console.error("Play-Fehler:", e);
-    });
+    }).catch(e => console.error("Play-Fehler:", e));
   } else {
     audio.pause();
     playPauseBtn.textContent = "▶ Play";
@@ -965,8 +962,8 @@ document.getElementById('themeBtn').onclick = toggleTheme;
 
 // VISUALIZER FUNKTIONEN
 function resizeCanvas() {
-  const maxW = Math.min(window.innerWidth * 0.98, 1200);
-  const maxH = window.innerHeight * 0.68;
+  const maxW = Math.min(window.innerWidth * 0.98, 1400);
+  const maxH = window.innerHeight * 0.70;
   const ratio = 16 / 9;
   let w = maxW;
   let h = w / ratio;
@@ -1030,7 +1027,7 @@ function drawWaveform() {
 
   for (let i = 0; i < bufferLength; i++) {
     const v = fadeDataArray[i] / 128.0;
-    const y = baseY - (v * canvas.height * 0.45);
+    const y = baseY - (v * canvas.height * 0.48); // etwas mehr Amplitude
     ctx.lineTo(x, y);
     x += sliceWidth;
   }
@@ -1040,16 +1037,16 @@ function drawWaveform() {
   ctx.closePath();
 
   const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-  gradient.addColorStop(0, 'rgba(0, 255, 255, 0.7)');
-  gradient.addColorStop(0.5, 'rgba(145, 70, 255, 0.5)');
-  gradient.addColorStop(1, 'rgba(0, 255, 255, 0.2)');
+  gradient.addColorStop(0, 'rgba(0, 255, 255, 0.8)');
+  gradient.addColorStop(0.5, 'rgba(145, 70, 255, 0.6)');
+  gradient.addColorStop(1, 'rgba(0, 255, 255, 0.3)');
 
   ctx.fillStyle = gradient;
   ctx.fill();
 
   ctx.strokeStyle = '#00ffff';
-  ctx.lineWidth = 4 + Math.max(...fadeDataArray) / 255 * 6;
-  ctx.shadowBlur = 25;
+  ctx.lineWidth = 5 + Math.max(...fadeDataArray) / 255 * 8;
+  ctx.shadowBlur = 30;
   ctx.shadowColor = '#00ffff';
   ctx.stroke();
 }
@@ -1059,14 +1056,14 @@ function drawBars() {
   let x = 0;
 
   for (let i = 0; i < bufferLength; i++) {
-    const height = (fadeDataArray[i] / 255) * canvas.height * 0.85;
+    const height = (fadeDataArray[i] / 255) * canvas.height * 0.88;
 
     const gradient = ctx.createLinearGradient(x, canvas.height - height, x, canvas.height);
-    gradient.addColorStop(0, `hsl(${190 + (i * 1.4)}, 100%, 65%)`);
+    gradient.addColorStop(0, `hsl(${190 + (i * 1.4)}, 100%, 70%)`);
     gradient.addColorStop(1, `hsl(${190 + (i * 1.4)}, 100%, 40%)`);
 
     ctx.fillStyle = gradient;
-    ctx.fillRect(x, canvas.height - height, barWidth - 1, height);
+    ctx.fillRect(x, canvas.height - height, barWidth - 0.5, height);
 
     x += barWidth;
   }
@@ -1076,26 +1073,26 @@ function drawLightning() {
   if (audio.paused || audio.ended || !audio.duration || audio.currentTime === 0) return;
 
   const bass = Math.max(...fadeDataArray.slice(0,40)) / 255;
-  ctx.fillStyle = `rgba(0,255,255,${bass * 0.08})`;
+  ctx.fillStyle = `rgba(0,255,255,${bass * 0.1})`;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  const numBolts = 3 + Math.floor(bass * 10);
+  const numBolts = 4 + Math.floor(bass * 12);
   for (let i = 0; i < numBolts; i++) {
     let x = Math.random() * canvas.width;
     let y = 0;
 
-    ctx.strokeStyle = `hsl(195, 100%, ${60 + bass * 25}%)`;
-    ctx.lineWidth = 1.8 + bass * 8;
-    ctx.shadowBlur = 30 + bass * 40;
-    ctx.shadowColor = 'rgba(160,255,255,0.7)';
+    ctx.strokeStyle = `hsl(195, 100%, ${60 + bass * 30}%)`;
+    ctx.lineWidth = 2 + bass * 10;
+    ctx.shadowBlur = 35 + bass * 50;
+    ctx.shadowColor = 'rgba(160,255,255,0.8)';
 
     ctx.beginPath();
     ctx.moveTo(x, y);
 
-    const steps = 10 + Math.floor(bass * 6);
+    const steps = 12 + Math.floor(bass * 8);
     for (let s = 1; s < steps; s++) {
-      y += canvas.height / steps * (0.7 + Math.random() * 0.5);
-      x += (Math.random() - 0.5) * (80 + bass * 180);
+      y += canvas.height / steps * (0.6 + Math.random() * 0.6);
+      x += (Math.random() - 0.5) * (100 + bass * 220);
       ctx.lineTo(x, y);
     }
 

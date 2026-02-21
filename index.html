@@ -231,7 +231,7 @@ button:disabled, button:disabled:hover {
   border-color: #ffdd00;
   box-shadow: 0 0 12px #ffdd00aa;
 }
-/* VISUALIZER – hier sind die wichtigen Änderungen */
+/* VISUALIZER – Design bleibt genau wie bei dir */
 #visualizerOverlay {
   position: fixed;
   inset: 0;
@@ -408,7 +408,6 @@ button:disabled, button:disabled:hover {
 </style>
 </head>
 <body>
-<!-- Dein kompletter Body bleibt exakt gleich -->
 <header>
   <div class="logo-container">
     <img src="https://raw.githubusercontent.com/VenomSnakeTwitch/VenomSnake_Twitch-Webseite/main/DogVenomsnakeLogo.png" alt="VenomSnake Logo">
@@ -533,7 +532,6 @@ button:disabled, button:disabled:hover {
   <div id="vizVersion">Visualizer v4.5</div>
 </div>
 <script>
-// ... (Service Worker, songs-Array, BASE_URL, alle Variablen und Funktionen bis resizeCanvas bleiben exakt gleich) ...
 // Service Worker Registrierung
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
@@ -546,38 +544,433 @@ if ('serviceWorker' in navigator) {
       });
   });
 }
-const songs = [ /* dein komplettes songs-Array */ ];
+const songs = [
+  "Snake Eater VenomSnake_Twitch Mix.mp3",
+  "Ghost Town by VenomSnake_Twitch.mp3",
+  "Wreckfest.mp3",
+  "In The Air Tonight(VenomSnake_Twitch).mp3",
+  "Paradies City.mp3",
+  "Parasitäres Bewustsein.mp3",
+  "Still Alive (Voiced).mp3",
+  "Yu-Gi-Oh! Master Duel Solo Gate Theme Synth Mix.mp3",
+  "ByeByeBeautiful.mp3",
+  "Kettenreaktion (Cover).mp3",
+  "Strasse der Verdammnis.mp3",
+  "Syphon Filter Synth Mix.mp3",
+  "VenomSnake Mode Intro song.mp3",
+  "Hell March [Retaliation Cover].mp3",
+  "Dance hall Dance(Cover).mp3",
+  "Resident Evil 5 Desperate Escape Main Theme Music(Remix).mp3",
+  "Bleed out My Frend.mp3",
+  "Revange.mp3",
+  "Revange 2.mp3",
+  "Survival Of Death.mp3",
+  "Pile of Total Wreck.mp3",
+  "Dessert Storm Ahead.mp3",
+  "Industrial Breakdown.mp3",
+  "Mental Breakdown.mp3",
+  "Metal Gear 2 Solid Snake Chasing the Green Beret Remix.mp3",
+  "Metal Gear 2 Solid Snake Freqency 140.85 Remix Version 2026.mp3",
+  "Metal Gear 2 Solid Snake Level1 Warning Remix.mp3",
+  "Metal Gear 2 Solid Snake Level3 Warning Remix.mp3",
+  "Metal Gear 2 Solid Snake Reprieve of The Doctor Remix.mp3",
+  "Operation Stealth Destruction.mp3",
+  "Takin' On The Shagohod Remake.mp3"
+];
 const BASE_URL = "https://raw.githubusercontent.com/VenomSnakeTwitch/VenomSnake_Twitch-Webseite/main/";
 let currentIndex = 0;
 let radioMode = false;
 let loopCurrent = false;
 const audio = document.getElementById("audioPlayer");
-// ... alle const und let bis logoImg bleiben gleich ...
+const playPauseBtn = document.getElementById("playPauseBtn");
+const songSelect = document.getElementById("songSelect");
+const progress = document.getElementById("progress");
+const timeLabel = document.getElementById("timeLabel");
+const durationLabel = document.getElementById("durationLabel");
+const volumeSlider = document.getElementById("volumeSlider");
+const downloadBtn = document.getElementById("downloadBtn");
+const loopBtn = document.getElementById("loopBtn");
+const radioToggle = document.getElementById("radioToggle");
+// VISUALIZER
+const visualizerOverlay = document.getElementById('visualizerOverlay');
+const visualizerBtn = document.getElementById('visualizerBtn');
+const closeVisualizer = document.getElementById('closeVisualizer');
+const vizFullscreenBtn = document.getElementById('vizFullscreenBtn');
+const vizBgUploadBtn = document.getElementById('vizBgUploadBtn');
+const vizResetBgBtn = document.getElementById('vizResetBgBtn');
+const bgFileInput = document.getElementById('bgFileInput');
+const canvas = document.getElementById('visualizerCanvas');
+const ctx = canvas.getContext('2d');
+const modeBtns = document.querySelectorAll('.mode-btn');
+const vizPlayPauseBtn = document.getElementById('vizPlayPauseBtn');
+const vizDownloadBtn = document.getElementById('vizDownloadBtn');
+const vizSongSelect = document.getElementById('vizSongSelect');
+let audioContext = null;
+let analyser = null;
+let bufferLength = 0;
+let dataArray = null;
+let fadeDataArray = null;
+let animationId = null;
+let vizMode = 2;
+const logoImg = new Image();
+logoImg.src = "https://raw.githubusercontent.com/VenomSnakeTwitch/VenomSnake_Twitch-Webseite/main/DogVenomsnakeLogo.png";
 
-// VISUALIZER FUNKTIONEN – hier sind die korrigierten Teile
+// Hintergrund nur auf Canvas
+vizBgUploadBtn.addEventListener('click', () => { bgFileInput.click(); });
+bgFileInput.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(event) {
+    const bgUrl = event.target.result;
+    canvas.style.backgroundImage = `url(${bgUrl})`;
+    canvas.style.backgroundSize = 'cover';
+    canvas.style.backgroundPosition = 'center';
+    canvas.style.backgroundRepeat = 'no-repeat';
+    localStorage.setItem('customVisualizerCanvasBg', bgUrl);
+    if (vizResetBgBtn) vizResetBgBtn.style.display = 'inline-block';
+  };
+  reader.readAsDataURL(file);
+});
+if (vizResetBgBtn) {
+  vizResetBgBtn.addEventListener('click', () => {
+    canvas.style.backgroundImage = '';
+    localStorage.removeItem('customVisualizerCanvasBg');
+    vizResetBgBtn.style.display = 'none';
+  });
+}
+window.addEventListener('load', () => {
+  const savedBg = localStorage.getItem('customVisualizerCanvasBg');
+  if (savedBg) {
+    canvas.style.backgroundImage = `url(${savedBg})`;
+    canvas.style.backgroundSize = 'cover';
+    canvas.style.backgroundPosition = 'center';
+    canvas.style.backgroundRepeat = 'no-repeat';
+    if (vizResetBgBtn) vizResetBgBtn.style.display = 'inline-block';
+  }
+});
+
+// Download-Button
+function updateVizDownloadBtn() {
+  if (audio.src && !audio.paused && !audio.ended) {
+    vizDownloadBtn.disabled = false;
+    vizDownloadBtn.onclick = () => {
+      const a = document.createElement('a');
+      a.href = audio.src;
+      a.download = songs[currentIndex];
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    };
+  } else {
+    vizDownloadBtn.disabled = true;
+    vizDownloadBtn.onclick = null;
+  }
+}
+// Vollbild
+vizFullscreenBtn.addEventListener('click', () => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(err => console.error("Vollbild fehlgeschlagen:", err));
+  } else {
+    document.exitFullscreen();
+  }
+});
+// Lautstärke Sync
+function syncVolumeSliderFromSystem() {
+  const currentVolume = audio.volume;
+  if (Math.abs(currentVolume - parseFloat(volumeSlider.value)) > 0.01) {
+    volumeSlider.value = currentVolume;
+  }
+}
+let volumePollingInterval = null;
+function startVolumePolling() {
+  if (volumePollingInterval) clearInterval(volumePollingInterval);
+  volumePollingInterval = setInterval(() => {
+    if (!audio.paused && !audio.ended) syncVolumeSliderFromSystem();
+  }, 150);
+}
+function stopVolumePolling() {
+  if (volumePollingInterval) {
+    clearInterval(volumePollingInterval);
+    volumePollingInterval = null;
+  }
+}
+audio.addEventListener('play', startVolumePolling);
+audio.addEventListener('pause', stopVolumePolling);
+audio.addEventListener('ended', stopVolumePolling);
+volumeSlider.addEventListener('input', () => { audio.volume = parseFloat(volumeSlider.value); });
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') {
+    syncVolumeSliderFromSystem();
+    if (!audio.paused && !audio.ended) startVolumePolling();
+  } else {
+    stopVolumePolling();
+  }
+});
+function initAudioContext() {
+  if (audioContext) return;
+  audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  analyser = audioContext.createAnalyser();
+  analyser.fftSize = 512;
+  bufferLength = analyser.frequencyBinCount;
+  dataArray = new Uint8Array(bufferLength);
+  fadeDataArray = new Uint8Array(bufferLength);
+  const source = audioContext.createMediaElementSource(audio);
+  source.connect(analyser);
+  analyser.connect(audioContext.destination);
+}
+function resumeAudioContext() {
+  if (!audioContext) initAudioContext();
+  if (audioContext.state === 'suspended') audioContext.resume();
+}
+function togglePlay() {
+  resumeAudioContext();
+  if (audio.paused || audio.ended) {
+    audio.play().then(() => {
+      playPauseBtn.textContent = "⏸ Pause";
+      vizPlayPauseBtn.textContent = "⏸";
+      updateVizDownloadBtn();
+    }).catch(e => console.error("Play-Fehler:", e));
+  } else {
+    audio.pause();
+    playPauseBtn.textContent = "▶ Play";
+    vizPlayPauseBtn.textContent = "▶";
+    updateVizDownloadBtn();
+  }
+}
+function loadSong(index) {
+  currentIndex = index;
+  const fileName = songs[index];
+  const safeName = encodeURIComponent(fileName);
+  const url = BASE_URL + safeName;
+  audio.src = url;
+  songSelect.value = index;
+  if (vizSongSelect) vizSongSelect.value = index;
+  downloadBtn.href = url;
+  downloadBtn.setAttribute("download", fileName);
+  document.getElementById("currentSong").textContent = "▶ " + songSelect.options[index].text;
+  updateVizDownloadBtn();
+}
+function selectSong() {
+  resumeAudioContext();
+  loadSong(parseInt(songSelect.value));
+  togglePlay();
+}
+function selectSongFromViz() {
+  resumeAudioContext();
+  loadSong(parseInt(vizSongSelect.value));
+  togglePlay();
+}
+function nextSong() {
+  if (radioMode) {
+    loadSong(Math.floor(Math.random() * songs.length));
+  } else {
+    loadSong((currentIndex + 1) % songs.length);
+  }
+  togglePlay();
+}
+function prevSong() {
+  if (radioMode) return;
+  loadSong((currentIndex - 1 + songs.length) % songs.length);
+  togglePlay();
+}
+function stopSong() {
+  audio.pause();
+  audio.currentTime = 0;
+  playPauseBtn.textContent = "▶ Play";
+  vizPlayPauseBtn.textContent = "▶";
+  updateVizDownloadBtn();
+}
+function toggleRadioMode() {
+  radioMode = !radioMode;
+  radioToggle.textContent = radioMode ? "🎧 Radio aus" : "🎧 Radio-Modus";
+  if (radioMode) nextSong();
+}
+function toggleFullscreen() {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+  else document.exitFullscreen();
+}
+loopBtn.addEventListener("click", () => {
+  if (radioMode) return;
+  loopCurrent = !loopCurrent;
+  loopBtn.classList.toggle("active", loopCurrent);
+});
+audio.addEventListener("timeupdate", () => {
+  if (!audio.duration) return;
+  progress.value = (audio.currentTime / audio.duration) * 100;
+  timeLabel.textContent = formatTime(audio.currentTime);
+  durationLabel.textContent = formatTime(audio.duration);
+});
+progress.addEventListener("input", () => {
+  if (audio.duration) audio.currentTime = (progress.value / 100) * audio.duration;
+});
+function formatTime(time) {
+  if (isNaN(time)) return "0:00";
+  const min = Math.floor(time / 60);
+  const sec = Math.floor(time % 60).toString().padStart(2, '0');
+  return min + ":" + sec;
+}
+audio.addEventListener("ended", () => {
+  if (loopCurrent && !radioMode) {
+    audio.currentTime = 0;
+    togglePlay();
+  } else {
+    nextSong();
+  }
+});
+function updateLoopButtonState() {
+  loopBtn.disabled = radioMode;
+  if (radioMode) loopBtn.classList.remove("active");
+}
+// Dark Mode
+function toggleTheme() {
+  const current = document.documentElement.getAttribute('data-theme') || 'dark';
+  const next = current === 'dark' ? 'light' : 'dark';
+  document.documentElement.setAttribute('data-theme', next);
+  localStorage.setItem('playerTheme', next);
+  document.getElementById('themeBtn').textContent = next === 'light' ? '☀️' : '🌙';
+}
+const savedTheme = localStorage.getItem('playerTheme');
+if (savedTheme) {
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  document.getElementById('themeBtn').textContent = savedTheme === 'light' ? '☀️' : '🌙';
+}
+document.getElementById('themeBtn').onclick = toggleTheme;
+// VISUALIZER FUNKTIONEN
 function resizeCanvas() {
-  const containerWidth = canvas.parentElement.clientWidth || window.innerWidth;
-  canvas.width = containerWidth;
+  const maxW = canvas.parentElement.clientWidth || window.innerWidth;
   const maxH = window.innerHeight * 0.62;
-  const ratio = 1.45;
-  let h = containerWidth / ratio;
-  if (h > maxH) h = maxH;
+  const ratio = 900 / 620;
+  let w = maxW;
+  let h = w / ratio;
+  if (h > maxH) { h = maxH; w = h * ratio; }
+  canvas.width = Math.floor(w);
   canvas.height = Math.floor(h);
 }
-
 function clearBackground() {
-  ctx.fillStyle = 'rgba(0,0,0,0.75)';   // dunkler, damit kein Grün mehr durchkommt
+  ctx.fillStyle = 'rgba(0,0,0,0.75)';   // verhindert den grünen Schimmer
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
-
-// drawRing, drawWaveform, drawBars, drawLightning bleiben gleich (wie in der letzten Version)
-
+function drawRing() {
+  ctx.save();
+  const centerX = canvas.width / 2;
+  const centerY = canvas.height / 2;
+  const logoBase = Math.min(canvas.width, canvas.height) * 0.48;
+  const logoSize = logoBase;
+  if (logoImg.complete) {
+    ctx.shadowBlur = 40;
+    ctx.shadowColor = 'rgba(0,255,255,0.7)';
+    ctx.drawImage(logoImg, centerX - logoSize/2, centerY - logoSize/2, logoSize, logoSize);
+  }
+  const ringRadius = logoSize * 0.58;
+  const ringThickness = 8 + Math.max(...fadeDataArray) / 255 * 6;
+  ctx.beginPath();
+  ctx.arc(centerX, centerY, ringRadius, 0, Math.PI * 2);
+  ctx.lineWidth = ringThickness;
+  ctx.strokeStyle = `hsla(200, 100%, 70%, 0.45)`;
+  ctx.shadowBlur = 35;
+  ctx.shadowColor = `rgba(0, 255, 255, 0.7)`;
+  ctx.stroke();
+  const rayCount = 96;
+  for (let i = 0; i < rayCount; i++) {
+    const angle = (i / rayCount) * Math.PI * 2;
+    const mirroredIndex = Math.min(i, rayCount - 1 - i);
+    const freqIndex = Math.floor((mirroredIndex / rayCount) * bufferLength);
+    const amp = fadeDataArray[freqIndex] / 255;
+    const rayLength = amp * (ringRadius * 0.65);
+    const innerX = centerX + Math.cos(angle) * ringRadius;
+    const innerY = centerY + Math.sin(angle) * ringRadius;
+    const outerX = centerX + Math.cos(angle) * (ringRadius + rayLength);
+    const outerY = centerY + Math.sin(angle) * (ringRadius + rayLength);
+    const hue = 180 + (i * 3.75) % 180;
+    ctx.strokeStyle = `hsla(${hue}, 100%, ${60 + amp * 40}%, ${0.75 + amp * 0.25})`;
+    ctx.lineWidth = 2.5 + amp * 10;
+    ctx.shadowBlur = 20 + amp * 40;
+    ctx.shadowColor = `hsla(${hue}, 100%, 80%, 0.8)`;
+    ctx.beginPath();
+    ctx.moveTo(innerX, innerY);
+    ctx.lineTo(outerX, outerY);
+    ctx.stroke();
+  }
+  ctx.restore();
+}
+function drawWaveform() {
+  clearBackground();
+  const baseY = canvas.height;
+  ctx.beginPath();
+  ctx.moveTo(0, baseY);
+  const sliceWidth = canvas.width / bufferLength;
+  let x = 0;
+  for (let i = 0; i < bufferLength; i++) {
+    const v = fadeDataArray[i] / 128.0;
+    const y = baseY - (v * canvas.height * 0.96);
+    ctx.lineTo(x, y);
+    x += sliceWidth;
+  }
+  ctx.lineTo(canvas.width, baseY);
+  ctx.lineTo(0, baseY);
+  ctx.closePath();
+  const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  gradient.addColorStop(0, 'rgba(0, 255, 255, 0.85)');
+  gradient.addColorStop(0.4, 'rgba(145, 70, 255, 0.75)');
+  gradient.addColorStop(1, 'rgba(0, 255, 255, 0.15)');
+  ctx.fillStyle = gradient;
+  ctx.fill();
+  ctx.strokeStyle = '#00ffff';
+  ctx.lineWidth = 6 + Math.max(...fadeDataArray) / 255 * 10;
+  ctx.shadowBlur = 40;
+  ctx.shadowColor = '#00ffffcc';
+  ctx.stroke();
+}
+function drawBars() {
+  clearBackground();
+  const barWidth = canvas.width / bufferLength;
+  let x = 0;
+  for (let i = 0; i < bufferLength; i++) {
+    const height = (fadeDataArray[i] / 255) * canvas.height * 0.96;
+    const gradient = ctx.createLinearGradient(x, canvas.height - height, x, canvas.height);
+    gradient.addColorStop(0, `hsl(${190 + i * 1.4}, 100%, 72%)`);
+    gradient.addColorStop(1, `hsl(${190 + i * 1.4}, 100%, 30%)`);
+    ctx.fillStyle = gradient;
+    ctx.fillRect(x, canvas.height - height, barWidth - 1, height);
+    ctx.fillStyle = `hsla(${190 + i * 1.4}, 100%, 85%, 0.4)`;
+    ctx.fillRect(x, canvas.height - height, barWidth - 1, 3);
+    x += barWidth;
+  }
+}
+function drawLightning() {
+  if (audio.paused || audio.ended || !audio.duration || audio.currentTime === 0) return;
+  clearBackground();
+  const bass = Math.max(...fadeDataArray.slice(0,50)) / 255;
+  const flashOpacity = bass * 0.18;
+  ctx.fillStyle = `rgba(0,255,255,${flashOpacity})`;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  const numBolts = 3 + Math.floor(bass * 16);
+  for (let i = 0; i < numBolts; i++) {
+    let x = Math.random() * canvas.width;
+    let y = canvas.height * 0.55 + Math.random() * canvas.height * 0.45;
+    ctx.strokeStyle = `hsl(195, 100%, ${50 + bass * 40}%)`;
+    ctx.lineWidth = 2.5 + bass * 14;
+    ctx.shadowBlur = 50 + bass * 70;
+    ctx.shadowColor = 'rgba(180,255,255,0.9)';
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    const steps = 10 + Math.floor(bass * 12);
+    for (let s = 1; s < steps; s++) {
+      y -= (canvas.height / steps) * (0.4 + Math.random() * 0.7);
+      x += (Math.random() - 0.5) * (140 + bass * 320);
+      x = Math.max(0, Math.min(canvas.width, x));
+      ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+  }
+}
 function drawVisualizer() {
   animationId = requestAnimationFrame(drawVisualizer);
-  if (vizMode === 0) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-  } else {
+  if (vizMode !== 0) {
     clearBackground();
+  } else {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
   if (audio.paused || audio.ended || audio.currentTime === 0) {
     for (let i = 0; i < bufferLength; i++) {
@@ -587,15 +980,67 @@ function drawVisualizer() {
   } else {
     analyser.getByteFrequencyData(fadeDataArray);
   }
-  if      (vizMode === 0) drawRing();
+  if (vizMode === 0) drawRing();
   else if (vizMode === 1) drawWaveform();
   else if (vizMode === 2) drawBars();
-  else                    drawLightning();
+  else drawLightning();
 }
-
-// startVisualizer, stopVisualizer, alle Event-Listener und window.addEventListener('load') bleiben gleich
-// (genau wie in deiner letzten Version)
-
+function startVisualizer() {
+  if (!audioContext) initAudioContext();
+  resumeAudioContext();
+  resizeCanvas();
+  if (!animationId) drawVisualizer();
+  updateVizDownloadBtn();
+}
+function stopVisualizer() {
+  if (animationId) {
+    cancelAnimationFrame(animationId);
+    animationId = null;
+  }
+}
+function populateVizSongSelect() {
+  vizSongSelect.innerHTML = songSelect.innerHTML;
+  vizSongSelect.value = currentIndex;
+}
+// EVENT LISTENER
+visualizerBtn.addEventListener('click', () => {
+  resumeAudioContext();
+  if (audio.paused) togglePlay();
+  visualizerOverlay.classList.add('active');
+  populateVizSongSelect();
+  startVisualizer();
+});
+closeVisualizer.addEventListener('click', () => {
+  visualizerOverlay.classList.remove('active');
+  stopVisualizer();
+});
+modeBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    modeBtns.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    vizMode = parseInt(btn.dataset.mode);
+  });
+});
+document.addEventListener('keydown', e => {
+  if (e.key === "Escape" && visualizerOverlay.classList.contains('active')) closeVisualizer.click();
+});
+window.addEventListener('resize', () => {
+  if (visualizerOverlay.classList.contains('active')) resizeCanvas();
+});
+// START
+window.addEventListener('load', () => {
+  const saved = localStorage.getItem('playerTheme');
+  if (saved === 'light') {
+    document.documentElement.setAttribute('data-theme', 'light');
+    document.getElementById('themeBtn').textContent = '☀️';
+  }
+  loadSong(0);
+  updateLoopButtonState();
+  populateVizSongSelect();
+  resizeCanvas();
+  volumeSlider.value = 0.5;
+  setTimeout(syncVolumeSliderFromSystem, 500);
+});
 </script>
 </body>
 </html>

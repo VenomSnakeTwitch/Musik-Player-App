@@ -972,44 +972,57 @@ function drawRing() {
   ctx.save();
   const centerX = canvas.width / 2;
   const centerY = canvas.height / 2;
-  const logoBase = Math.min(canvas.width, canvas.height) * 0.32;
+
+  // Logo deutlich größer machen (ca. 45–50 % der kleineren Seite)
+  const logoBase = Math.min(canvas.width, canvas.height) * 0.48;  // ← hier größer (vorher 0.32)
   const logoSize = logoBase;
+
   if (logoImg.complete) {
-    ctx.shadowBlur = 30;
-    ctx.shadowColor = 'rgba(0,255,255,0.5)';
+    ctx.shadowBlur = 40;                     // stärkerer Glow für größeres Logo
+    ctx.shadowColor = 'rgba(0,255,255,0.7)';
     ctx.drawImage(logoImg, centerX - logoSize/2, centerY - logoSize/2, logoSize, logoSize);
   }
-  const ringRadius = logoSize * 0.6;
-  const ringThickness = 6;
-  const ringOpacity = 0.4;
+
+  // Ring um das Logo – etwas weiter außen, damit es nicht überlappt
+  const ringRadius = logoSize * 0.58;        // Ring etwas größer relativ zum Logo
+  const ringThickness = 8 + Math.max(...fadeDataArray) / 255 * 6; // Dicke pulsiert leicht
+  const ringOpacity = 0.45;
+
   ctx.beginPath();
   ctx.arc(centerX, centerY, ringRadius, 0, Math.PI * 2);
   ctx.lineWidth = ringThickness;
   ctx.strokeStyle = `hsla(200, 100%, 70%, ${ringOpacity})`;
-  ctx.shadowBlur = 25;
-  ctx.shadowColor = `rgba(0, 255, 255, 0.6)`;
+  ctx.shadowBlur = 35;
+  ctx.shadowColor = `rgba(0, 255, 255, 0.7)`;
   ctx.stroke();
-  const rayCount = 72;
+
+  // Strahlen (Rays) – mehr Dynamik durch größeres Logo
+  const rayCount = 96;  // mehr Strahlen für volleren Look
   for (let i = 0; i < rayCount; i++) {
     const angle = (i / rayCount) * Math.PI * 2;
     const mirroredIndex = Math.min(i, rayCount - 1 - i);
     const freqIndex = Math.floor((mirroredIndex / rayCount) * bufferLength);
     const amp = fadeDataArray[freqIndex] / 255;
-    const rayLength = amp * (ringRadius * 0.5);
+
+    const rayLength = amp * (ringRadius * 0.65); // länger, da Logo größer
+
     const innerX = centerX + Math.cos(angle) * ringRadius;
     const innerY = centerY + Math.sin(angle) * ringRadius;
     const outerX = centerX + Math.cos(angle) * (ringRadius + rayLength);
     const outerY = centerY + Math.sin(angle) * (ringRadius + rayLength);
-    const hue = 180 + (i * 5) % 180;
-    ctx.strokeStyle = `hsla(${hue}, 100%, ${60 + amp * 40}%, ${0.7 + amp * 0.3})`;
-    ctx.lineWidth = 2 + amp * 8;
-    ctx.shadowBlur = 15 + amp * 30;
-    ctx.shadowColor = `hsla(${hue}, 100%, 80%, 0.7)`;
+
+    const hue = 180 + (i * 3.75) % 180; // feinere Farbverläufe
+    ctx.strokeStyle = `hsla(${hue}, 100%, ${60 + amp * 40}%, ${0.75 + amp * 0.25})`;
+    ctx.lineWidth = 2.5 + amp * 10;
+    ctx.shadowBlur = 20 + amp * 40;
+    ctx.shadowColor = `hsla(${hue}, 100%, 80%, 0.8)`;
+
     ctx.beginPath();
     ctx.moveTo(innerX, innerY);
     ctx.lineTo(outerX, outerY);
     ctx.stroke();
   }
+
   ctx.restore();
 }
 

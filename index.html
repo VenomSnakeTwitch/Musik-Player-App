@@ -259,12 +259,12 @@ button:disabled, button:disabled:hover {
   object-fit: contain;
 }
 .viz-header {
-  position: relative; /* wichtig für absolute Close-Button */
+  position: relative;
   width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 72px 0 24px; /* viel Platz rechts für den absolut positionierten X-Button */
+  padding: 20px 72px 0 24px;
   box-sizing: border-box;
 }
 .viz-header h2 {
@@ -279,8 +279,8 @@ button:disabled, button:disabled:hover {
   gap: 8px;
   align-items: center;
 }
-.viz-header-btn {
-  padding: 9px 14px;
+.viz-options-select {
+  padding: 10px 18px;
   font-size: 1rem;
   background: linear-gradient(145deg, rgba(0,255,255,0.15), rgba(145,70,255,0.15));
   border: 1px solid rgba(0,255,255,0.5);
@@ -290,16 +290,15 @@ button:disabled, button:disabled:hover {
   transition: all 0.3s ease;
   text-shadow: 0 0 8px rgba(0,255,255,0.6);
   box-shadow: 0 3px 12px rgba(0,0,0,0.4);
-  min-width: 55px;
+  min-width: 150px;
 }
-.viz-header-btn:hover {
+.viz-options-select:hover {
   background: linear-gradient(145deg, rgba(0,255,255,0.35), rgba(145,70,255,0.35));
   border-color: #ffffff;
-  transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(0,255,255,0.4);
 }
 #closeVisualizer {
-  position: absolute; /* fixiert oben rechts – wird nie mehr abgeschnitten */
+  position: absolute;
   top: 20px;
   right: 24px;
   background: linear-gradient(145deg, rgba(255,51,102,0.25), rgba(255,102,153,0.15));
@@ -379,33 +378,13 @@ button:disabled, button:disabled:hover {
 }
 @media (max-width: 768px) {
   #visualizerCanvas { max-height: 58vh; }
-  .viz-header { 
-    padding: 18px 62px 0 18px; 
-  }
-  #closeVisualizer {
-    top: 18px;
-    right: 18px;
-    padding: 8px 14px;
-    font-size: 1.35rem;
-  }
+  .viz-header { padding: 18px 62px 0 18px; }
+  #closeVisualizer { top: 18px; right: 18px; padding: 8px 14px; font-size: 1.35rem; }
+  .viz-options-select { min-width: 135px; padding: 8px 14px; font-size: 0.95rem; }
 }
 @media (max-width: 480px) {
-  .viz-header { 
-    padding: 16px 58px 0 16px; 
-  }
-  #closeVisualizer {
-    top: 16px;
-    right: 16px;
-    padding: 7px 13px;
-    font-size: 1.3rem;
-  }
-  #vizHeaderControls {
-    gap: 6px;
-  }
-  .viz-header-btn {
-    padding: 7px 11px;
-    font-size: 0.92rem;
-  }
+  .viz-header { padding: 16px 58px 0 16px; }
+  #closeVisualizer { top: 16px; right: 16px; padding: 7px 13px; font-size: 1.3rem; }
 }
 </style>
 </head>
@@ -512,10 +491,12 @@ button:disabled, button:disabled:hover {
   <div class="viz-header">
     <h2>VENOM VISUALIZER</h2>
     <div id="vizHeaderControls">
-      <button id="vizFullscreenBtn" class="viz-header-btn">Vollbild</button>
-      <button id="vizBgUploadBtn" class="viz-header-btn">Hintergrund</button>
-      <button id="vizResetBgBtn" class="viz-header-btn" style="display:none;">Reset</button>
-      <button id="closeVisualizer" class="viz-header-btn">✕</button>
+      <select id="vizOptionsSelect" class="viz-options-select" onchange="handleVizOption(this.value); this.value = '';">
+        <option value="">Optionen</option>
+        <option value="fullscreen">Vollbild</option>
+        <option value="background">Hintergrund ändern</option>
+        <option value="reset" id="vizResetOption" style="display:none;">Hintergrund zurücksetzen</option>
+      </select>
     </div>
   </div>
   <input type="file" id="bgFileInput" accept="image/*" style="display:none;">
@@ -596,19 +577,18 @@ const downloadBtn = document.getElementById("downloadBtn");
 const loopBtn = document.getElementById("loopBtn");
 const radioToggle = document.getElementById("radioToggle");
 
-// VISUALIZER – nur RING
+// VISUALIZER
 const visualizerOverlay = document.getElementById('visualizerOverlay');
 const visualizerBtn = document.getElementById('visualizerBtn');
 const closeVisualizer = document.getElementById('closeVisualizer');
-const vizFullscreenBtn = document.getElementById('vizFullscreenBtn');
-const vizBgUploadBtn = document.getElementById('vizBgUploadBtn');
-const vizResetBgBtn = document.getElementById('vizResetBgBtn');
-const bgFileInput = document.getElementById('bgFileInput');
 const canvas = document.getElementById('visualizerCanvas');
 const ctx = canvas.getContext('2d');
 const vizPlayPauseBtn = document.getElementById('vizPlayPauseBtn');
 const vizDownloadBtn = document.getElementById('vizDownloadBtn');
 const vizSongSelect = document.getElementById('vizSongSelect');
+const bgFileInput = document.getElementById('bgFileInput');
+const vizOptionsSelect = document.getElementById('vizOptionsSelect');
+const vizResetOption = document.getElementById('vizResetOption');
 
 let audioContext = null;
 let analyser = null;
@@ -621,8 +601,6 @@ const logoImg = new Image();
 logoImg.src = "https://raw.githubusercontent.com/VenomSnakeTwitch/VenomSnake_Twitch-Webseite/main/DogVenomsnakeLogo.png";
 
 // Hintergrund-Upload
-vizBgUploadBtn.addEventListener('click', () => bgFileInput.click());
-
 bgFileInput.addEventListener('change', e => {
   const file = e.target.files[0];
   if (!file) return;
@@ -634,15 +612,9 @@ bgFileInput.addEventListener('change', e => {
     canvas.style.backgroundPosition = 'center';
     canvas.style.backgroundRepeat = 'no-repeat';
     localStorage.setItem('customVisualizerCanvasBg', bgUrl);
-    vizResetBgBtn.style.display = 'inline-block';
+    vizResetOption.style.display = 'block';
   };
   reader.readAsDataURL(file);
-});
-
-vizResetBgBtn.addEventListener('click', () => {
-  canvas.style.backgroundImage = '';
-  localStorage.removeItem('customVisualizerCanvasBg');
-  vizResetBgBtn.style.display = 'none';
 });
 
 window.addEventListener('load', () => {
@@ -652,7 +624,7 @@ window.addEventListener('load', () => {
     canvas.style.backgroundSize = 'cover';
     canvas.style.backgroundPosition = 'center';
     canvas.style.backgroundRepeat = 'no-repeat';
-    vizResetBgBtn.style.display = 'inline-block';
+    vizResetOption.style.display = 'block';
   }
 });
 
@@ -674,14 +646,23 @@ function updateVizDownloadBtn() {
   }
 }
 
-// Vollbild Visualizer
-vizFullscreenBtn.addEventListener('click', () => {
-  if (!document.fullscreenElement) {
-    document.documentElement.requestFullscreen().catch(err => console.error("Vollbild fehlgeschlagen:", err));
-  } else {
-    document.exitFullscreen();
+// Dropdown-Handler
+function handleVizOption(value) {
+  if (!value) return;
+  if (value === 'fullscreen') {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(err => console.error("Vollbild fehlgeschlagen:", err));
+    } else {
+      document.exitFullscreen();
+    }
+  } else if (value === 'background') {
+    bgFileInput.click();
+  } else if (value === 'reset') {
+    canvas.style.backgroundImage = '';
+    localStorage.removeItem('customVisualizerCanvasBg');
+    vizResetOption.style.display = 'none';
   }
-});
+}
 
 // Lautstärke Sync
 function syncVolumeSliderFromSystem() {
@@ -874,10 +855,7 @@ if (savedTheme) {
 
 document.getElementById('themeBtn').onclick = toggleTheme;
 
-// ────────────────────────────────────────────────────────────────
 // VISUALIZER – RING Modus
-// ────────────────────────────────────────────────────────────────
-
 function resizeCanvas() {
   canvas.width = visualizerOverlay.clientWidth;
   canvas.height = Math.floor(window.innerHeight * 0.62);
@@ -889,7 +867,7 @@ function drawRing() {
   const centerX = canvas.width / 2;
   const centerY = canvas.height / 2;
 
-  const logoBase = Math.min(canvas.width, canvas.height) * 0.56;
+  const logoBase = Math.min(canvas.width, canvas.height) * 0.58;
   const logoSize = logoBase;
 
   if (logoImg.complete) {
@@ -898,8 +876,8 @@ function drawRing() {
     ctx.drawImage(logoImg, centerX - logoSize/2, centerY - logoSize/2, logoSize, logoSize);
   }
 
-  const ringRadius = logoSize * 0.65;
-  const ringThickness = 9 + Math.max(...fadeDataArray) / 255 * 8;
+  const ringRadius = logoSize * 0.68;
+  const ringThickness = 10 + Math.max(...fadeDataArray) / 255 * 8;
 
   ctx.beginPath();
   ctx.arc(centerX, centerY, ringRadius, 0, Math.PI * 2);
@@ -909,8 +887,7 @@ function drawRing() {
   ctx.shadowColor = `rgba(0, 255, 255, 0.8)`;
   ctx.stroke();
 
-  // Strahlen dunkelblau
-  const rayCount = 110;
+  const rayCount = 120;
   for (let i = 0; i < rayCount; i++) {
     const angle = (i / rayCount) * Math.PI * 2;
     const mirroredIndex = Math.min(i, rayCount - 1 - i);

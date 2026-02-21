@@ -280,18 +280,30 @@ button:disabled, button:disabled:hover {
   align-items: center;
 }
 .viz-header-btn {
-  font-size: 2.2rem;
-  background: none;
-  border: none;
-  color: #ff3366;
+  padding: 12px 20px;
+  font-size: 1.3rem;
+  background: linear-gradient(145deg, rgba(0,255,255,0.15), rgba(145,70,255,0.15));
+  border: 1px solid rgba(0,255,255,0.5);
+  color: #fff;
+  border-radius: 12px;
   cursor: pointer;
-  transition: all 0.3s;
-  padding: 0;
-  line-height: 1;
+  transition: all 0.3s ease;
+  text-shadow: 0 0 8px rgba(0,255,255,0.6);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+  min-width: 70px;
 }
 .viz-header-btn:hover {
-  transform: scale(1.15);
-  color: #ff6699;
+  background: linear-gradient(145deg, rgba(0,255,255,0.35), rgba(145,70,255,0.35));
+  border-color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0,255,255,0.4);
+}
+#closeVisualizer {
+  background: linear-gradient(145deg, rgba(255,51,102,0.25), rgba(255,102,153,0.15));
+  border: 1px solid #ff3366;
+}
+#closeVisualizer:hover {
+  background: linear-gradient(145deg, rgba(255,51,102,0.45), rgba(255,102,153,0.35));
 }
 .viz-mode-buttons {
   margin-top: 25px;
@@ -553,8 +565,8 @@ button:disabled, button:disabled:hover {
   <div class="viz-header">
     <h2>VENOM VISUALIZER</h2>
     <div id="vizHeaderControls">
-      <button id="vizFullscreenBtn" class="viz-header-btn">⛶</button> <!-- Vollbild-Button (Icon) -->
-      <button id="closeVisualizer" class="viz-header-btn">✕</button> <!-- Schließen-Button -->
+      <button id="vizFullscreenBtn" class="viz-header-btn">Vollbild</button>
+      <button id="closeVisualizer" class="viz-header-btn">✕</button>
     </div>
   </div>
 
@@ -684,7 +696,7 @@ function updateVizDownloadBtn() {
   }
 }
 
-// Vollbild-Button im Visualizer (neben Schließen)
+// Vollbild-Button (oben rechts, gleiches Design wie die unteren Buttons)
 vizFullscreenBtn.addEventListener('click', () => {
   if (!document.fullscreenElement) {
     document.documentElement.requestFullscreen().catch(err => {

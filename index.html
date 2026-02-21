@@ -521,25 +521,49 @@ let vizMode = 2;
 const logoImg = new Image();
 logoImg.src = "https://raw.githubusercontent.com/VenomSnakeTwitch/VenomSnake_Twitch-Webseite/main/DogVenomsnakeLogo.png";
 
-// Synchronisation des Lautstärke-Reglers mit System-Lautstärke (neu!)
-function syncVolumeSlider() {
-  if (audio.volume !== parseFloat(volumeSlider.value)) {
-    volumeSlider.value = audio.volume;
+// Verbesserte Lautstärke-Synchronisation (Hardware-Tasten + System-Regler)
+function syncVolumeSliderFromSystem() {
+  const currentVolume = audio.volume;
+  if (Math.abs(currentVolume - parseFloat(volumeSlider.value)) > 0.01) {
+    volumeSlider.value = currentVolume;
+    console.log("Lautstärke synchronisiert von System auf:", currentVolume);
   }
 }
 
-// Alle 300 ms prüfen (Hardware-Tasten feuern oft kein Event)
-setInterval(syncVolumeSlider, 300);
+let volumePollingInterval = null;
 
-// Zusätzliche Events für sofortige Aktualisierung
-audio.addEventListener('volumechange', syncVolumeSlider);
-audio.addEventListener('play', syncVolumeSlider);
-audio.addEventListener('pause', syncVolumeSlider);
+function startVolumePolling() {
+  if (volumePollingInterval) clearInterval(volumePollingInterval);
+  volumePollingInterval = setInterval(() => {
+    if (!audio.paused && !audio.ended) {
+      syncVolumeSliderFromSystem();
+    }
+  }, 150); // 150 ms – schnell & akkuschonend
+}
 
-// Wenn die Seite wieder sichtbar wird (z. B. nach Hintergrund), syncen
+function stopVolumePolling() {
+  if (volumePollingInterval) {
+    clearInterval(volumePollingInterval);
+    volumePollingInterval = null;
+  }
+}
+
+// Events zum Starten/Stoppen des Polling
+audio.addEventListener('play', startVolumePolling);
+audio.addEventListener('pause', stopVolumePolling);
+audio.addEventListener('ended', stopVolumePolling);
+
+// Zusätzliche Syncs
+volumeSlider.addEventListener('input', () => {
+  audio.volume = parseFloat(volumeSlider.value);
+});
+
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') {
-    syncVolumeSlider();
+    syncVolumeSliderFromSystem();
+    if (!audio.paused && !audio.ended) startVolumePolling();
+  } else {
+    stopVolumePolling();
   }
 });
 
@@ -655,7 +679,7 @@ progress.addEventListener("input", () => {
 });
 
 volumeSlider.addEventListener("input", () => {
-  audio.volume = volumeSlider.value;
+  audio.volume = parseFloat(volumeSlider.value);
 });
 
 function formatTime(time) {
@@ -903,6 +927,8 @@ window.addEventListener('load', () => {
   populateVizSongSelect();
   resizeCanvas();
   volumeSlider.value = 0.5;
+  // Initialer Sync nach Laden
+  setTimeout(syncVolumeSliderFromSystem, 500);
 });
 </script>
 </body>

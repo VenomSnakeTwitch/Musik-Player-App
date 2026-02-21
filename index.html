@@ -239,12 +239,16 @@ button:disabled, button:disabled:hover {
   position: fixed;
   inset: 0;
   background: rgba(3,3,25,0.97);
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
   backdrop-filter: blur(14px);
   display: none;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   z-index: 2000;
+  transition: background 0.5s ease;
 }
 #visualizerOverlay.active {
   display: flex;
@@ -276,31 +280,33 @@ button:disabled, button:disabled:hover {
 }
 #vizHeaderControls {
   display: flex;
-  gap: 16px;
+  gap: 12px;
   align-items: center;
 }
 .viz-header-btn {
-  padding: 12px 20px;
-  font-size: 1.3rem;
+  padding: 10px 18px;
+  font-size: 1.1rem;
   background: linear-gradient(145deg, rgba(0,255,255,0.15), rgba(145,70,255,0.15));
   border: 1px solid rgba(0,255,255,0.5);
   color: #fff;
-  border-radius: 12px;
+  border-radius: 10px;
   cursor: pointer;
   transition: all 0.3s ease;
   text-shadow: 0 0 8px rgba(0,255,255,0.6);
-  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-  min-width: 70px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.4);
+  min-width: 60px;
 }
 .viz-header-btn:hover {
   background: linear-gradient(145deg, rgba(0,255,255,0.35), rgba(145,70,255,0.35));
   border-color: #ffffff;
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0,255,255,0.4);
+  box-shadow: 0 6px 20px rgba(0,255,255,0.4);
 }
 #closeVisualizer {
   background: linear-gradient(145deg, rgba(255,51,102,0.25), rgba(255,102,153,0.15));
   border: 1px solid #ff3366;
+  padding: 10px 16px;
+  font-size: 1.4rem;
 }
 #closeVisualizer:hover {
   background: linear-gradient(145deg, rgba(255,51,102,0.45), rgba(255,102,153,0.35));
@@ -448,7 +454,7 @@ button:disabled, button:disabled:hover {
     padding: 12px;
   }
   #vizHeaderControls {
-    gap: 12px;
+    gap: 10px;
   }
 }
 @media (max-width: 480px) {
@@ -566,9 +572,13 @@ button:disabled, button:disabled:hover {
     <h2>VENOM VISUALIZER</h2>
     <div id="vizHeaderControls">
       <button id="vizFullscreenBtn" class="viz-header-btn">Vollbild</button>
+      <button id="vizBgUploadBtn" class="viz-header-btn">Hintergrund</button>
+      <button id="vizResetBgBtn" class="viz-header-btn" style="display:none;">Reset</button>
       <button id="closeVisualizer" class="viz-header-btn">✕</button>
     </div>
   </div>
+
+  <input type="file" id="bgFileInput" accept="image/*" style="display:none;">
 
   <canvas id="visualizerCanvas"></canvas>
 
@@ -660,6 +670,9 @@ const visualizerOverlay = document.getElementById('visualizerOverlay');
 const visualizerBtn = document.getElementById('visualizerBtn');
 const closeVisualizer = document.getElementById('closeVisualizer');
 const vizFullscreenBtn = document.getElementById('vizFullscreenBtn');
+const vizBgUploadBtn = document.getElementById('vizBgUploadBtn');
+const vizResetBgBtn = document.getElementById('vizResetBgBtn');
+const bgFileInput = document.getElementById('bgFileInput');
 const canvas = document.getElementById('visualizerCanvas');
 const ctx = canvas.getContext('2d');
 const modeBtns = document.querySelectorAll('.mode-btn');
@@ -677,6 +690,42 @@ let vizMode = 2;
 
 const logoImg = new Image();
 logoImg.src = "https://raw.githubusercontent.com/VenomSnakeTwitch/VenomSnake_Twitch-Webseite/main/DogVenomsnakeLogo.png";
+
+// Hintergrund-Upload & Reset
+vizBgUploadBtn.addEventListener('click', () => {
+  bgFileInput.click();
+});
+
+bgFileInput.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(event) {
+    const bgUrl = event.target.result;
+    visualizerOverlay.style.backgroundImage = `url(${bgUrl})`;
+    localStorage.setItem('customVisualizerBg', bgUrl);
+    if (vizResetBgBtn) vizResetBgBtn.style.display = 'inline-block';
+  };
+  reader.readAsDataURL(file);
+});
+
+if (vizResetBgBtn) {
+  vizResetBgBtn.addEventListener('click', () => {
+    visualizerOverlay.style.backgroundImage = '';
+    localStorage.removeItem('customVisualizerBg');
+    vizResetBgBtn.style.display = 'none';
+  });
+}
+
+// Beim Laden gespeichertes Hintergrundbild wiederherstellen
+window.addEventListener('load', () => {
+  const savedBg = localStorage.getItem('customVisualizerBg');
+  if (savedBg) {
+    visualizerOverlay.style.backgroundImage = `url(${savedBg})`;
+    if (vizResetBgBtn) vizResetBgBtn.style.display = 'inline-block';
+  }
+});
 
 // Download-Button im Visualizer aktualisieren
 function updateVizDownloadBtn() {
@@ -696,7 +745,7 @@ function updateVizDownloadBtn() {
   }
 }
 
-// Vollbild-Button (oben rechts, gleiches Design wie die unteren Buttons)
+// Vollbild-Button
 vizFullscreenBtn.addEventListener('click', () => {
   if (!document.fullscreenElement) {
     document.documentElement.requestFullscreen().catch(err => {

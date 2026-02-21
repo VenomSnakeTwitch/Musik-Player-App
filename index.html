@@ -248,14 +248,19 @@ button:disabled, button:disabled:hover {
   display: flex;
 }
 #visualizerCanvas {
-  border-radius: 24px;
-  box-shadow: 0 0 60px #00ffff88, 0 0 120px #9146ff55;
+  width: 100% !important;
+  height: 100% !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
   background: #00000033 center/cover no-repeat;
-  max-width: 96vw;
-  max-height: 60vh;
-  width: 100%;
-  height: auto;
-  object-fit: contain;
+}
+#visualizerCanvas.ring-mode {
+  width: 96vw !important;
+  max-width: 96vw !important;
+  height: 60vh !important;
+  max-height: 60vh !important;
+  border-radius: 24px !important;
+  box-shadow: 0 0 60px #00ffff88, 0 0 120px #9146ff55 !important;
 }
 .viz-header {
   width: 100%;
@@ -440,9 +445,6 @@ button:disabled, button:disabled:hover {
     flex-direction: column;
     height: auto;
     max-height: 50vh;
-  }
-  #visualizerCanvas {
-    max-height: 55vh;
   }
   #vizControls {
     flex-direction: row;
@@ -909,14 +911,16 @@ if (savedTheme) {
 document.getElementById('themeBtn').onclick = toggleTheme;
 // VISUALIZER FUNKTIONEN
 function resizeCanvas() {
-  const maxW = Math.min(window.innerWidth * 0.96, 1200);
-  const maxH = window.innerHeight * 0.60;
-  const ratio = 900 / 620;
-  let w = maxW;
-  let h = w / ratio;
-  if (h > maxH) { h = maxH; w = h * ratio; }
-  canvas.width = Math.floor(w);
-  canvas.height = Math.floor(h);
+  canvas.width = visualizerOverlay.clientWidth;
+  canvas.height = visualizerOverlay.clientHeight;
+
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width *= dpr;
+  canvas.height *= dpr;
+  canvas.style.width = visualizerOverlay.clientWidth + 'px';
+  canvas.style.height = visualizerOverlay.clientHeight + 'px';
+
+  ctx.scale(dpr, dpr);
 }
 function drawRing() {
   ctx.save();
@@ -963,64 +967,68 @@ function drawRing() {
   ctx.restore();
 }
 function drawWaveform() {
-  const baseY = canvas.height; // Start ganz unten
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const baseY = canvas.height * 0.5;
   ctx.beginPath();
   ctx.moveTo(0, baseY);
   const sliceWidth = canvas.width / bufferLength;
   let x = 0;
   for (let i = 0; i < bufferLength; i++) {
     const v = fadeDataArray[i] / 128.0;
-    const y = baseY - (v * canvas.height * 0.92); // wächst stark nach oben
+    const y = baseY - (v * canvas.height * 0.88);
     ctx.lineTo(x, y);
     x += sliceWidth;
   }
   ctx.lineTo(canvas.width, baseY);
-  ctx.lineTo(0, baseY);
+  ctx.lineTo(canvas.width, canvas.height);
+  ctx.lineTo(0, canvas.height);
   ctx.closePath();
   const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
   gradient.addColorStop(0, 'rgba(0, 255, 255, 0.9)');
-  gradient.addColorStop(0.5, 'rgba(145, 70, 255, 0.7)');
-  gradient.addColorStop(1, 'rgba(0, 255, 255, 0.2)');
+  gradient.addColorStop(0.45, 'rgba(145, 70, 255, 0.75)');
+  gradient.addColorStop(1, 'rgba(0, 0, 80, 0.35)');
   ctx.fillStyle = gradient;
   ctx.fill();
   ctx.strokeStyle = '#00ffff';
-  ctx.lineWidth = 5 + Math.max(...fadeDataArray) / 255 * 8;
-  ctx.shadowBlur = 35;
-  ctx.shadowColor = '#00ffffaa';
+  ctx.lineWidth = 5 + (Math.max(...fadeDataArray) / 255) * 10;
+  ctx.shadowBlur = 40;
+  ctx.shadowColor = '#00ffffcc';
   ctx.stroke();
 }
 function drawBars() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
   const barWidth = canvas.width / bufferLength;
   let x = 0;
   for (let i = 0; i < bufferLength; i++) {
-    const height = (fadeDataArray[i] / 255) * canvas.height * 0.92;
+    const height = (fadeDataArray[i] / 255) * canvas.height * 0.98;
     const gradient = ctx.createLinearGradient(x, canvas.height - height, x, canvas.height);
-    gradient.addColorStop(0, `hsl(${190 + i * 1.2}, 100%, 70%)`);
-    gradient.addColorStop(1, `hsl(${190 + i * 1.2}, 100%, 35%)`);
+    gradient.addColorStop(0, `hsl(${190 + i * 1.4}, 100%, 75%)`);
+    gradient.addColorStop(1, `hsl(${190 + i * 1.4}, 100%, 30%)`);
     ctx.fillStyle = gradient;
-    ctx.fillRect(x, canvas.height - height, barWidth, height);
+    ctx.fillRect(x, canvas.height - height, barWidth - 0.5, height);
     x += barWidth;
   }
 }
 function drawLightning() {
   if (audio.paused || audio.ended || !audio.duration || audio.currentTime === 0) return;
-  const bass = Math.max(...fadeDataArray.slice(0,40)) / 255;
-  ctx.fillStyle = `rgba(0,255,255,${bass * 0.12})`;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const bass = Math.max(...fadeDataArray.slice(0,50)) / 255;
+  ctx.fillStyle = `rgba(0,255,255,${bass * 0.18})`;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  const numBolts = 4 + Math.floor(bass * 14);
+  const numBolts = 3 + Math.floor(bass * 20);
   for (let i = 0; i < numBolts; i++) {
     let x = Math.random() * canvas.width;
-    let y = canvas.height * 0.6 + Math.random() * canvas.height * 0.4; // Start eher unten
-    ctx.strokeStyle = `hsl(195, 100%, ${55 + bass * 35}%)`;
-    ctx.lineWidth = 2 + bass * 12;
-    ctx.shadowBlur = 40 + bass * 60;
-    ctx.shadowColor = 'rgba(160,255,255,0.85)';
+    let y = Math.random() * canvas.height * 0.4;
+    ctx.strokeStyle = `hsl(195, 100%, ${50 + bass * 45}%)`;
+    ctx.lineWidth = 2.5 + bass * 16;
+    ctx.shadowBlur = 50 + bass * 90;
+    ctx.shadowColor = 'rgba(180,255,255,0.92)';
     ctx.beginPath();
     ctx.moveTo(x, y);
-    const steps = 12 + Math.floor(bass * 10);
+    const steps = 10 + Math.floor(bass * 16);
     for (let s = 1; s < steps; s++) {
-      y -= canvas.height / steps * (0.5 + Math.random() * 0.6); // nach oben bewegen
-      x += (Math.random() - 0.5) * (120 + bass * 280);
+      y += (canvas.height / steps) * (0.7 + Math.random() * 0.9);
+      x += (Math.random() - 0.5) * (160 + bass * 360);
       x = Math.max(0, Math.min(canvas.width, x));
       ctx.lineTo(x, y);
     }
@@ -1029,10 +1037,10 @@ function drawLightning() {
 }
 function drawVisualizer() {
   animationId = requestAnimationFrame(drawVisualizer);
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  if (vizMode !== 0) ctx.clearRect(0, 0, canvas.width, canvas.height);
   if (audio.paused || audio.ended || audio.currentTime === 0) {
     for (let i = 0; i < bufferLength; i++) {
-      fadeDataArray[i] *= 0.95;
+      fadeDataArray[i] *= 0.94;
       if (fadeDataArray[i] < 1) fadeDataArray[i] = 0;
     }
   } else {
@@ -1080,6 +1088,9 @@ modeBtns.forEach(btn => {
     modeBtns.forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
     vizMode = parseInt(btn.dataset.mode);
+    canvas.classList.toggle('ring-mode', vizMode === 0);
+    resizeCanvas();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
   });
 });
 document.addEventListener('keydown', e => {

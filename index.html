@@ -1,155 +1,83 @@
-<!DOCTYPE html>
-<html lang="de" data-theme="dark">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<!-- PWA Essentials -->
-<meta name="theme-color" content="#9146ff">
-<meta name="background-color" content="#000033">
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="android-launchericon-192-192.png">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<link rel="icon" type="image/x-icon" href="favicon.ico">
-<!-- Zusätzliche Meta-Tags für besseren Standalone-Modus -->
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+function drawWaveform() {
+  const baseY = canvas.height / 2;  // mittig für symmetrische Welle
+  ctx.beginPath();
+  ctx.moveTo(0, baseY);
 
-<title>VenomSnake Musikplayer</title>
+  const sliceWidth = canvas.width / bufferLength;  // volle Breite nutzen
+  let x = 0;
 
-<style>
-/* ... dein gesamtes bisheriges CSS bleibt gleich bis hier ... */
+  for (let i = 0; i < bufferLength; i++) {
+    const v = fadeDataArray[i] / 128.0;
+    const y = baseY - (v * canvas.height * 0.45);  // Amplitude bleibt gleich
 
-/* VISUALIZER – wichtig: Overlay bleibt dunkel, nur Canvas bekommt Bild */
-#visualizerOverlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(3,3,25,0.97);           /* bleibt dunkel / semi-transparent */
-  backdrop-filter: blur(14px);
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-  transition: none;                        /* kein Übergang mehr nötig */
-}
-
-#visualizerOverlay.active {
-  display: flex;
-}
-
-/* Canvas bekommt jetzt das Custom-Bild */
-#visualizerCanvas {
-  border-radius: 24px;
-  box-shadow: 0 0 60px #00ffff88, 0 0 120px #9146ff55;
-  background: #00000033 center/cover no-repeat;   /* Default + Platzhalter */
-  max-width: 96vw;
-  max-height: 60vh;
-  width: 100%;
-  height: auto;
-  object-fit: contain;
-  transition: background 0.5s ease;
-}
-
-/* Mode-Buttons bekommen leichten transparenten Hintergrund */
-.viz-mode-buttons {
-  margin-top: 25px;
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-  justify-content: center;
-  background: rgba(0,0,0,0.4);             /* leicht dunkel, damit Bild durchscheint */
-  padding: 12px 24px;
-  border-radius: 16px;
-  backdrop-filter: blur(8px);
-}
-
-/* ... Rest deines CSS bleibt gleich ... */
-</style>
-</head>
-<body>
-<!-- ... dein Header und Overlay bleiben 1:1 gleich ... -->
-
-<!-- VISUALIZER OVERLAY (angepasst) -->
-<div id="visualizerOverlay">
-  <div class="viz-header">
-    <h2>VENOM VISUALIZER</h2>
-    <div id="vizHeaderControls">
-      <button id="vizFullscreenBtn" class="viz-header-btn">Vollbild</button>
-      <button id="vizBgUploadBtn" class="viz-header-btn">Hintergrund</button>
-      <button id="vizResetBgBtn" class="viz-header-btn" style="display:none;">Reset</button>
-      <button id="closeVisualizer" class="viz-header-btn">✕</button>
-    </div>
-  </div>
-
-  <input type="file" id="bgFileInput" accept="image/*" style="display:none;">
-
-  <canvas id="visualizerCanvas"></canvas>
-
-  <div class="viz-mode-buttons">
-    <button class="mode-btn" data-mode="0">RING</button>
-    <button class="mode-btn" data-mode="1">WAVE</button>
-    <button class="mode-btn active" data-mode="2">BARS</button>
-    <button class="mode-btn" data-mode="3">⚡ BLITZ</button>
-  </div>
-
-  <div id="vizControls">
-    <button onclick="prevSong()" class="viz-btn">⏮</button>
-    <button id="vizPlayPauseBtn" onclick="togglePlay()" class="viz-btn">▶</button>
-    <button id="vizDownloadBtn" class="viz-btn" disabled>Download</button>
-    <button onclick="nextSong()" class="viz-btn">⏭</button>
-    <select id="vizSongSelect" onchange="selectSongFromViz()" class="viz-select"></select>
-  </div>
-
-  <div id="vizVersion">Visualizer v4.5</div>
-</div>
-
-<script>
-// ... dein gesamter bisheriger Script-Code bleibt gleich bis hier ...
-
-// Hintergrund-Upload & Reset – jetzt nur auf Canvas setzen!
-vizBgUploadBtn.addEventListener('click', () => {
-  bgFileInput.click();
-});
-
-bgFileInput.addEventListener('change', (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = function(event) {
-    const bgUrl = event.target.result;
-
-    // Hintergrund NUR auf das Canvas setzen
-    canvas.style.backgroundImage = `url(${bgUrl})`;
-
-    // Optional: in localStorage speichern
-    localStorage.setItem('customVisualizerCanvasBg', bgUrl);
-
-    if (vizResetBgBtn) vizResetBgBtn.style.display = 'inline-block';
-  };
-  reader.readAsDataURL(file);
-});
-
-if (vizResetBgBtn) {
-  vizResetBgBtn.addEventListener('click', () => {
-    canvas.style.backgroundImage = '';                    // Canvas zurücksetzen
-    localStorage.removeItem('customVisualizerCanvasBg');
-    vizResetBgBtn.style.display = 'none';
-  });
-}
-
-// Beim Laden: gespeichertes Canvas-Hintergrundbild wiederherstellen
-window.addEventListener('load', () => {
-  const savedBg = localStorage.getItem('customVisualizerCanvasBg');
-  if (savedBg) {
-    canvas.style.backgroundImage = `url(${savedBg})`;
-    if (vizResetBgBtn) vizResetBgBtn.style.display = 'inline-block';
+    ctx.lineTo(x, y);
+    x += sliceWidth;
   }
-});
 
-// ... Rest deines Scripts (drawRing, drawVisualizer, etc.) bleibt 1:1 gleich ...
-</script>
-</body>
-</html>
+  ctx.lineTo(canvas.width, baseY);
+  ctx.lineTo(0, baseY);
+  ctx.closePath();
+
+  const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+  gradient.addColorStop(0, 'rgba(0, 255, 255, 0.7)');
+  gradient.addColorStop(0.5, 'rgba(145, 70, 255, 0.5)');
+  gradient.addColorStop(1, 'rgba(0, 255, 255, 0.2)');
+
+  ctx.fillStyle = gradient;
+  ctx.fill();
+
+  ctx.strokeStyle = '#00ffff';
+  ctx.lineWidth = 4 + Math.max(...fadeDataArray) / 255 * 6;
+  ctx.shadowBlur = 25;
+  ctx.shadowColor = '#00ffff';
+  ctx.stroke();
+}
+
+function drawBars() {
+  const barWidth = canvas.width / bufferLength;  // volle Breite, kein Padding
+  let x = 0;
+
+  for (let i = 0; i < bufferLength; i++) {
+    const height = (fadeDataArray[i] / 255) * canvas.height * 0.85;  // fast volle Höhe
+
+    const gradient = ctx.createLinearGradient(x, canvas.height - height, x, canvas.height);
+    gradient.addColorStop(0, `hsl(${190 + (i * 1.4)}, 100%, 65%)`);
+    gradient.addColorStop(1, `hsl(${190 + (i * 1.4)}, 100%, 40%)`);
+
+    ctx.fillStyle = gradient;
+    ctx.fillRect(x, canvas.height - height, barWidth - 1, height);  // -1 für minimalen Abstand
+
+    x += barWidth;
+  }
+}
+
+function drawLightning() {
+  if (audio.paused || audio.ended || !audio.duration || audio.currentTime === 0) return;
+
+  const bass = Math.max(...fadeDataArray.slice(0,40)) / 255;
+  ctx.fillStyle = `rgba(0,255,255,${bass * 0.08})`;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const numBolts = 3 + Math.floor(bass * 10);  // mehr Blitze für volle Fläche
+  for (let i = 0; i < numBolts; i++) {
+    let x = Math.random() * canvas.width;  // von ganz links bis ganz rechts
+    let y = 0;
+
+    ctx.strokeStyle = `hsl(195, 100%, ${60 + bass * 25}%)`;
+    ctx.lineWidth = 1.8 + bass * 8;
+    ctx.shadowBlur = 30 + bass * 40;
+    ctx.shadowColor = 'rgba(160,255,255,0.7)';
+
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+
+    const steps = 10 + Math.floor(bass * 6);
+    for (let s = 1; s < steps; s++) {
+      y += canvas.height / steps * (0.7 + Math.random() * 0.5);
+      x += (Math.random() - 0.5) * (80 + bass * 180);  // mehr horizontale Bewegung
+      ctx.lineTo(x, y);
+    }
+
+    ctx.stroke();
+  }
+}

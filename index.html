@@ -564,7 +564,7 @@ const downloadBtn = document.getElementById("downloadBtn");
 const loopBtn = document.getElementById("loopBtn");
 const radioToggle = document.getElementById("radioToggle");
 
-// VISUALIZER – nur RING
+// VISUALIZER – nur RING (Logo & Ring etwas kleiner, passt jetzt perfekt)
 const visualizerOverlay = document.getElementById('visualizerOverlay');
 const visualizerBtn = document.getElementById('visualizerBtn');
 const closeVisualizer = document.getElementById('closeVisualizer');
@@ -843,7 +843,7 @@ if (savedTheme) {
 document.getElementById('themeBtn').onclick = toggleTheme;
 
 // ────────────────────────────────────────────────────────────────
-// VISUALIZER – RING Modus (Logo & Ring deutlich größer)
+// VISUALIZER – RING Modus (Logo & Ring etwas kleiner, passt perfekt)
 // ────────────────────────────────────────────────────────────────
 
 function resizeCanvas() {
@@ -857,47 +857,47 @@ function drawRing() {
   const centerX = canvas.width / 2;
   const centerY = canvas.height / 2;
 
-  // Logo deutlich größer
-  const logoBase = Math.min(canvas.width, canvas.height) * 0.68; // war 0.48 → jetzt 0.68
+  // Logo etwas kleiner – passt jetzt perfekt rein
+  const logoBase = Math.min(canvas.width, canvas.height) * 0.58; // war 0.68 → jetzt 0.58
   const logoSize = logoBase;
 
   if (logoImg.complete) {
-    ctx.shadowBlur = 60;               // stärkerer Glow
-    ctx.shadowColor = 'rgba(0,255,255,0.85)';
+    ctx.shadowBlur = 50;
+    ctx.shadowColor = 'rgba(0,255,255,0.8)';
     ctx.drawImage(logoImg, centerX - logoSize/2, centerY - logoSize/2, logoSize, logoSize);
   }
 
-  // Ring um das Logo deutlich größer
-  const ringRadius = logoSize * 0.78;   // war 0.58 → jetzt 0.78
-  const ringThickness = 12 + Math.max(...fadeDataArray) / 255 * 10;  // dickerer Ring
+  // Ring etwas enger am Logo – mehr Platz für Strahlen
+  const ringRadius = logoSize * 0.68;   // war 0.78 → jetzt 0.68
+  const ringThickness = 10 + Math.max(...fadeDataArray) / 255 * 8;  // etwas schlanker
 
   ctx.beginPath();
   ctx.arc(centerX, centerY, ringRadius, 0, Math.PI * 2);
   ctx.lineWidth = ringThickness;
   ctx.strokeStyle = `hsla(200, 100%, 70%, 0.55)`;
-  ctx.shadowBlur = 50;
-  ctx.shadowColor = `rgba(0, 255, 255, 0.85)`;
+  ctx.shadowBlur = 45;
+  ctx.shadowColor = `rgba(0, 255, 255, 0.8)`;
   ctx.stroke();
 
-  // Mehr Strahlen für epischen Look
-  const rayCount = 120;  // war 96 → jetzt 120
+  // Strahlen mit genug Platz außen
+  const rayCount = 120;
   for (let i = 0; i < rayCount; i++) {
     const angle = (i / rayCount) * Math.PI * 2;
     const mirroredIndex = Math.min(i, rayCount - 1 - i);
     const freqIndex = Math.floor((mirroredIndex / rayCount) * bufferLength);
     const amp = fadeDataArray[freqIndex] / 255;
-    const rayLength = amp * (ringRadius * 0.75);  // etwas längere Strahlen
+    const rayLength = amp * (ringRadius * 0.70);  // etwas kürzer → mehr Randplatz
 
     const innerX = centerX + Math.cos(angle) * ringRadius;
     const innerY = centerY + Math.sin(angle) * ringRadius;
     const outerX = centerX + Math.cos(angle) * (ringRadius + rayLength);
     const outerY = centerY + Math.sin(angle) * (ringRadius + rayLength);
 
-    const hue = 180 + (i * 3) % 180;  // etwas flüssigere Farbverlauf
+    const hue = 180 + (i * 3) % 180;
     ctx.strokeStyle = `hsla(${hue}, 100%, ${60 + amp * 40}%, ${0.8 + amp * 0.2})`;
-    ctx.lineWidth = 3 + amp * 12;
-    ctx.shadowBlur = 30 + amp * 50;
-    ctx.shadowColor = `hsla(${hue}, 100%, 85%, 0.9)`;
+    ctx.lineWidth = 3 + amp * 10;
+    ctx.shadowBlur = 25 + amp * 45;
+    ctx.shadowColor = `hsla(${hue}, 100%, 85%, 0.85)`;
 
     ctx.beginPath();
     ctx.moveTo(innerX, innerY);

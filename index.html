@@ -14,8 +14,10 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <title>VenomSnake Musikplayer</title>
+
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
+
 :root {
   --accent: #00ffff;
   --accent-dark: #9146ff;
@@ -25,11 +27,13 @@
   --text-light: #1a1a40;
   --glow: 0 0 15px rgba(0, 255, 255, 0.6);
 }
+
 [data-theme="light"] {
   --bg-overlay: var(--bg-light);
   --text-main: var(--text-light);
   --glow: 0 0 12px rgba(145, 70, 255, 0.5);
 }
+
 body {
   margin: 0;
   padding: 0;
@@ -42,6 +46,7 @@ body {
   overflow-x: hidden;
   touch-action: manipulation;
 }
+
 header {
   position: fixed;
   top: 0;
@@ -56,24 +61,29 @@ header {
   box-sizing: border-box;
   z-index: 1000;
 }
+
 header .logo-container {
   display: flex;
   align-items: center;
   gap: clamp(6px, 2vw, 10px);
 }
+
 header .logo-container img {
   height: clamp(35px, 8vw, 45px);
   object-fit: contain;
 }
+
 header .logo-container span {
   font-size: clamp(18px, 5vw, 24px);
   font-weight: bold;
   color: #9146ff;
   text-shadow: 0px 0px 8px #00ffff;
 }
+
 header .logo-container span .snake {
   color: #00ffff;
 }
+
 #overlay {
   background: var(--bg-overlay);
   width: 100%;
@@ -84,12 +94,14 @@ header .logo-container span .snake {
   padding: clamp(70px, 15vh, 100px) clamp(12px, 4vw, 24px) clamp(20px, 5vh, 40px);
   box-sizing: border-box;
 }
+
 h1 {
   font-size: clamp(24px, 8vw, 38px);
   margin: 0 0 8px 0;
   color: #ffffff;
   text-shadow: 0 0 12px #00ffff, 0 0 24px #000044;
 }
+
 #infoText {
   margin-top: 8px;
   font-size: clamp(14px, 3.5vw, 16px);
@@ -97,11 +109,13 @@ h1 {
   max-width: 90%;
   line-height: 1.4;
 }
+
 audio {
   width: 100%;
   max-width: 90vw;
   margin-top: 16px;
 }
+
 button, select, #downloadBtn {
   margin: clamp(6px, 1.5vw, 8px);
   padding: clamp(10px, 3vw, 12px) clamp(12px, 4vw, 16px);
@@ -115,11 +129,13 @@ button, select, #downloadBtn {
   touch-action: manipulation;
   min-width: 100px;
 }
+
 button:hover, #downloadBtn:hover, select:hover {
   border-color: var(--accent-dark);
   background: rgba(20,20,80,0.9);
   color: var(--accent);
 }
+
 button:disabled, button:disabled:hover {
   opacity: 0.45;
   cursor: not-allowed;
@@ -127,6 +143,7 @@ button:disabled, button:disabled:hover {
   color: #888;
   background: rgba(0,0,30,0.7);
 }
+
 #songControls, #controls, #progressContainer {
   margin-top: 12px;
   display: flex;
@@ -136,6 +153,7 @@ button:disabled, button:disabled:hover {
   width: 100%;
   max-width: 95vw;
 }
+
 #progress {
   -webkit-appearance: none;
   appearance: none;
@@ -146,6 +164,7 @@ button:disabled, button:disabled:hover {
   cursor: pointer;
   outline: none;
 }
+
 #progress::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
@@ -157,6 +176,7 @@ button:disabled, button:disabled:hover {
   cursor: pointer;
   margin-top: -5px;
 }
+
 #progress::-moz-range-thumb {
   width: clamp(16px, 4vw, 20px);
   height: clamp(16px, 4vw, 20px);
@@ -165,18 +185,21 @@ button:disabled, button:disabled:hover {
   border: 2px solid var(--accent);
   cursor: pointer;
 }
+
 #volumeContainer {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
 }
+
 #volumeContainer input[type="range"] {
   writing-mode: bt-lr;
   -webkit-appearance: slider-vertical;
   width: 8px;
   height: 100px;
 }
+
 #infoBox {
   display: flex;
   gap: clamp(12px, 3vw, 20px);
@@ -195,17 +218,21 @@ button:disabled, button:disabled:hover {
   scrollbar-width: thin;
   scrollbar-color: var(--accent) rgba(10,10,30,0.7);
 }
+
 #infoBox::-webkit-scrollbar { width: 8px; }
 #infoBox::-webkit-scrollbar-thumb { background-color: var(--accent); border-radius: 4px; }
 #infoBox::-webkit-scrollbar-track { background: rgba(10,10,30,0.7); }
+
 #infoBox .infoColumn {
   flex: 1 1 45%;
   min-width: 180px;
 }
+
 #infoBox .infoColumn h3 {
   margin: 0 0 8px 0;
   color: var(--accent);
 }
+
 /* Loop Button */
 .loop-btn {
   width: clamp(34px, 8vw, 38px);
@@ -219,17 +246,20 @@ button:disabled, button:disabled:hover {
   cursor: pointer;
   transition: all 0.25s;
 }
+
 .loop-btn:hover:not(:disabled) {
   background: rgba(20,20,80,0.9);
   color: var(--accent);
   border-color: var(--accent-dark);
 }
+
 .loop-btn.active {
   color: #ffdd00;
   background: rgba(80,60,0,0.5);
   border-color: #ffdd00;
   box-shadow: 0 0 12px #ffdd00aa;
 }
+
 /* VISUALIZER */
 #visualizerOverlay {
   position: fixed;
@@ -242,9 +272,11 @@ button:disabled, button:disabled:hover {
   justify-content: center;
   z-index: 2000;
 }
+
 #visualizerOverlay.active {
   display: flex;
 }
+
 #visualizerCanvas {
   width: 100%;
   max-width: 100%;
@@ -257,153 +289,32 @@ button:disabled, button:disabled:hover {
   background: transparent;
   display: block;
   object-fit: contain;
-}
-.viz-header {
-  position: relative;
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 24px 0 24px;
-  box-sizing: border-box;
-}
-.viz-header h2 {
-  margin: 0;
-  font-size: clamp(1.8rem, 6vw, 2.6rem);
-  text-shadow: 0 0 25px #00ffff;
-  color: #00ffff;
-  letter-spacing: 4px;
-}
-#vizHeaderControls {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
-.viz-options-select {
-  padding: 10px 18px;
-  font-size: 1rem;
-  background: linear-gradient(145deg, rgba(0,255,255,0.15), rgba(145,70,255,0.15));
-  border: 1px solid rgba(0,255,255,0.5);
-  color: #fff;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-shadow: 0 0 8px rgba(0,255,255,0.6);
-  box-shadow: 0 3px 12px rgba(0,0,0,0.4);
-  min-width: 150px;
-}
-.viz-options-select:hover {
-  background: linear-gradient(145deg, rgba(0,255,255,0.35), rgba(145,70,255,0.35));
-  border-color: #ffffff;
-  box-shadow: 0 6px 20px rgba(0,255,255,0.4);
-}
-#closeVisualizer {
-  position: static;
-  margin-left: 16px;
-  background: linear-gradient(145deg, rgba(255,51,102,0.25), rgba(255,102,153,0.15));
-  border: 1px solid #ff3366;
-  padding: 10px 16px;
-  font-size: 1.4rem;
-  z-index: 10;
-}
-#closeVisualizer:hover {
-  background: linear-gradient(145deg, rgba(255,51,102,0.45), rgba(255,102,153,0.35));
-}
-#vizControls {
-  margin-top: 22px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: rgba(0,0,40,0.92);
-  padding: 12px 24px;
-  border-radius: 16px;
-  border: 2px solid rgba(0,255,255,0.3);
-  box-shadow: 0 0 40px rgba(0,255,255,0.2);
-  flex-wrap: wrap;
-  justify-content: center;
-  backdrop-filter: blur(10px);
-}
-.viz-btn {
-  padding: 12px 20px;
-  font-size: 1.3rem;
-  background: linear-gradient(145deg, rgba(0,255,255,0.15), rgba(145,70,255,0.15));
-  border: 1px solid rgba(0,255,255,0.5);
-  color: #fff;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  min-width: 70px;
-  text-shadow: 0 0 8px rgba(0,255,255,0.6);
-  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-}
-.viz-btn:hover:not(:disabled) {
-  background: linear-gradient(145deg, rgba(0,255,255,0.35), rgba(145,70,255,0.35));
-  border-color: #ffffff;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0,255,255,0.4);
-}
-.viz-btn:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-  filter: grayscale(70%);
-}
-.viz-select {
-  padding: 12px 20px;
-  font-size: 1rem;
-  background: rgba(0,0,60,0.85);
-  border: 1px solid rgba(0,255,255,0.5);
-  color: #fff;
-  border-radius: 12px;
-  min-width: 240px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-}
-#vizVersion {
-  position: absolute;
-  bottom: 18px;
-  right: 24px;
-  font-size: 0.95rem;
-  color: #88f0ff;
-  opacity: 0.7;
-  text-shadow: 0 0 8px #00ffff, 0 0 14px #9146ff;
-  pointer-events: none;
-  letter-spacing: 1px;
-  font-weight: bold;
-  z-index: 10;
-}
-[data-theme="light"] #vizVersion {
-  color: #4169e1;
-  text-shadow: 0 0 6px #4169e1;
-  opacity: 0.8;
-}
-@media (max-width: 768px) {
-  #visualizerCanvas { max-height: 58vh; }
-  .viz-header { padding: 18px 18px 0 18px; }
-  #closeVisualizer { margin-left: 12px; padding: 8px 14px; font-size: 1.35rem; }
-  .viz-options-select { min-width: 135px; padding: 8px 14px; font-size: 0.95rem; }
-}
-@media (max-width: 480px) {
-  .viz-header { padding: 16px 16px 0 16px; }
-  #closeVisualizer { margin-left: 10px; padding: 7px 13px; font-size: 1.3rem; }
-  .viz-options-select { min-width: 120px; }
-}
-</style>
-</head>
+}</head>
 <body>
+
 <header>
   <div class="logo-container">
     <img src="https://raw.githubusercontent.com/VenomSnakeTwitch/VenomSnake_Twitch-Webseite/main/DogVenomsnakeLogo.png" alt="VenomSnake Logo">
     <span>VENOM<span class="snake">SNΛKE</span></span>
   </div>
+
   <div style="display: flex; gap: 12px; align-items: center;">
     <button id="visualizerBtn">🎵 Visualizer</button>
     <button id="themeBtn">🌙</button>
   </div>
 </header>
+
 <div id="overlay">
   <h1>VenomSnake_Twitch´s Musikplayer</h1>
-  <div id="infoText">Hier lade ich meine Musik, die ich mit Suno.com erstellt habe, hoch. Diese kannst du dir anhören und herunterladen.</div>
+  <div id="infoText">
+    Hier lade ich meine Musik, die ich mit Suno.com erstellt habe, hoch.  
+    Diese kannst du dir anhören und herunterladen.
+  </div>
+
   <h2 id="currentSong">▶ Kein Song ausgewählt</h2>
+
   <audio id="audioPlayer" crossorigin="anonymous"></audio>
+
   <div id="songControls">
     <select id="songSelect" onchange="selectSong()">
       <option value="0">Snake Eater VenomSnake_Twitch Mix</option>
@@ -439,18 +350,22 @@ button:disabled, button:disabled:hover {
       <option value="30">Takin' On The Shagohod Remake</option>
       <option value="31">Metal Gear 2 Solid Snake Freqency 140.85</option>
     </select>
+
     <a id="downloadBtn" href="" download>Download</a>
+
     <div id="volumeContainer">
       <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.5">
       <span>Lautstärke</span>
     </div>
   </div>
+
   <div id="progressContainer">
     <span id="timeLabel">0:00</span>
     <input type="range" id="progress" min="0" max="100" value="0">
     <button id="loopBtn" type="button" title="Aktuellen Song wiederholen (nicht im Radio-Modus möglich)" class="loop-btn">🔁</button>
     <span id="durationLabel">0:00</span>
   </div>
+
   <div id="controls">
     <button onclick="prevSong()">⏮ Vorheriger</button>
     <button id="playPauseBtn" onclick="togglePlay()">▶ Play</button>
@@ -459,6 +374,7 @@ button:disabled, button:disabled:hover {
     <button onclick="toggleFullscreen()">Vollbild</button>
     <button id="radioToggle" onclick="toggleRadioMode()">🎧 Radio-Modus</button>
   </div>
+
   <div id="infoBox">
     <div class="infoColumn">
       <h3>Neue Songs Sind Da!</h3>
@@ -479,6 +395,7 @@ button:disabled, button:disabled:hover {
       <p>Takin' On The Shagohod Remake</p>
       <p>Metal Gear 2 Solid Snake Freqency 140.85</p>
     </div>
+
     <div class="infoColumn">
       <h3>Bald Erscheinende Songs</h3>
       <p>Weitere Projekte in Planung...</p>
@@ -486,10 +403,11 @@ button:disabled, button:disabled:hover {
   </div>
 </div>
 
-<!-- VISUALIZER OVERLAY – nur RING -->
+<!-- VISUALIZER OVERLAY -->
 <div id="visualizerOverlay">
   <div class="viz-header">
     <h2>VENOM VISUALIZER</h2>
+
     <div id="vizHeaderControls">
       <select id="vizOptionsSelect" class="viz-options-select" onchange="handleVizOption(this.value); this.value = '';">
         <option value="">Optionen</option>
@@ -497,22 +415,26 @@ button:disabled, button:disabled:hover {
         <option value="background">Hintergrund ändern</option>
         <option value="reset" id="vizResetOption" style="display:none;">Hintergrund zurücksetzen</option>
       </select>
+
       <button id="closeVisualizer">✕</button>
     </div>
   </div>
+
   <input type="file" id="bgFileInput" accept="image/*" style="display:none;">
+
   <canvas id="visualizerCanvas"></canvas>
+
   <div id="vizControls">
     <button onclick="prevSong()" class="viz-btn">⏮</button>
     <button id="vizPlayPauseBtn" onclick="togglePlay()" class="viz-btn">▶</button>
     <button id="vizDownloadBtn" class="viz-btn" disabled>Download</button>
     <button onclick="nextSong()" class="viz-btn">⏭</button>
+
     <select id="vizSongSelect" onchange="selectSongFromViz()" class="viz-select"></select>
   </div>
-  <div id="vizVersion">Visualizer v4.5 – RING only</div>
-</div>
 
-<script>
+  <div id="vizVersion">Visualizer v4.5 – RING only</div>
+</div><script>
 // Service Worker Registrierung
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
@@ -985,5 +907,6 @@ window.addEventListener('load', () => {
   setTimeout(syncVolumeSliderFromSystem, 500);
 });
 </script>
+
 </body>
 </html>

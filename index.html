@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<!-- PWA Essentials -->
 <meta name="theme-color" content="#9146ff">
 <meta name="background-color" content="#000033">
 <link rel="manifest" href="manifest.json">
@@ -207,7 +206,6 @@ button:disabled, button:disabled:hover {
   margin: 0 0 8px 0;
   color: var(--accent);
 }
-/* Loop Button */
 .loop-btn {
   width: clamp(34px, 8vw, 38px);
   height: clamp(34px, 8vw, 38px);
@@ -231,7 +229,7 @@ button:disabled, button:disabled:hover {
   border-color: #ffdd00;
   box-shadow: 0 0 12px #ffdd00aa;
 }
-/* VISUALIZER – Design bleibt genau wie bei dir */
+/* VISUALIZER */
 #visualizerOverlay {
   position: fixed;
   inset: 0;
@@ -251,11 +249,12 @@ button:disabled, button:disabled:hover {
   max-width: 100%;
   max-height: 62vh;
   height: auto;
+  margin: 0;
+  padding: 0;
   border-radius: 16px;
   box-shadow: 0 0 60px #00ffff88, 0 0 140px #9146ff66;
   background: #00000044 center/cover no-repeat;
   display: block;
-  margin: 15px 0;
   object-fit: contain;
 }
 .viz-header {
@@ -401,7 +400,6 @@ button:disabled, button:disabled:hover {
   text-shadow: 0 0 6px #4169e1;
   opacity: 0.8;
 }
-/* Responsive */
 @media (max-width: 768px) {
   #visualizerCanvas { max-height: 58vh; }
 }
@@ -838,17 +836,12 @@ if (savedTheme) {
 document.getElementById('themeBtn').onclick = toggleTheme;
 // VISUALIZER FUNKTIONEN
 function resizeCanvas() {
-  const maxW = canvas.parentElement.clientWidth || window.innerWidth;
+  canvas.width = visualizerOverlay.clientWidth;   // volle Breite des Overlays (keine Freiräume)
   const maxH = window.innerHeight * 0.62;
-  const ratio = 900 / 620;
-  let w = maxW;
-  let h = w / ratio;
-  if (h > maxH) { h = maxH; w = h * ratio; }
-  canvas.width = Math.floor(w);
-  canvas.height = Math.floor(h);
+  canvas.height = Math.floor(maxH);
 }
 function clearBackground() {
-  ctx.fillStyle = 'rgba(0,0,0,0.75)';   // verhindert den grünen Schimmer
+  ctx.fillStyle = 'rgba(0,0,0,0.88)';   // stark abdunkeln → kein Grün mehr
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 }
 function drawRing() {
@@ -980,10 +973,10 @@ function drawVisualizer() {
   } else {
     analyser.getByteFrequencyData(fadeDataArray);
   }
-  if (vizMode === 0) drawRing();
+  if      (vizMode === 0) drawRing();
   else if (vizMode === 1) drawWaveform();
   else if (vizMode === 2) drawBars();
-  else drawLightning();
+  else                    drawLightning();
 }
 function startVisualizer() {
   if (!audioContext) initAudioContext();

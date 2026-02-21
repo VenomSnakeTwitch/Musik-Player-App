@@ -263,7 +263,7 @@ button:disabled, button:disabled:hover {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 40px 0;
+  padding: 20px 24px 0;
   box-sizing: border-box;
 }
 .viz-header h2 {
@@ -302,6 +302,7 @@ button:disabled, button:disabled:hover {
   border: 1px solid #ff3366;
   padding: 10px 16px;
   font-size: 1.4rem;
+  margin-left: 8px;
 }
 #closeVisualizer:hover {
   background: linear-gradient(145deg, rgba(255,51,102,0.45), rgba(255,102,153,0.35));
@@ -374,6 +375,7 @@ button:disabled, button:disabled:hover {
 }
 @media (max-width: 768px) {
   #visualizerCanvas { max-height: 58vh; }
+  .viz-header { padding: 18px 18px 0; }
 }
 </style>
 </head>
@@ -564,7 +566,7 @@ const downloadBtn = document.getElementById("downloadBtn");
 const loopBtn = document.getElementById("loopBtn");
 const radioToggle = document.getElementById("radioToggle");
 
-// VISUALIZER – nur RING (Logo & Ring etwas kleiner, passt jetzt perfekt)
+// VISUALIZER – nur RING
 const visualizerOverlay = document.getElementById('visualizerOverlay');
 const visualizerBtn = document.getElementById('visualizerBtn');
 const closeVisualizer = document.getElementById('closeVisualizer');
@@ -843,7 +845,7 @@ if (savedTheme) {
 document.getElementById('themeBtn').onclick = toggleTheme;
 
 // ────────────────────────────────────────────────────────────────
-// VISUALIZER – RING Modus (Logo & Ring etwas kleiner, passt perfekt)
+// VISUALIZER – RING Modus
 // ────────────────────────────────────────────────────────────────
 
 function resizeCanvas() {
@@ -857,8 +859,7 @@ function drawRing() {
   const centerX = canvas.width / 2;
   const centerY = canvas.height / 2;
 
-  // Logo etwas kleiner – passt jetzt perfekt rein
-  const logoBase = Math.min(canvas.width, canvas.height) * 0.58; // war 0.68 → jetzt 0.58
+  const logoBase = Math.min(canvas.width, canvas.height) * 0.58;
   const logoSize = logoBase;
 
   if (logoImg.complete) {
@@ -867,9 +868,8 @@ function drawRing() {
     ctx.drawImage(logoImg, centerX - logoSize/2, centerY - logoSize/2, logoSize, logoSize);
   }
 
-  // Ring etwas enger am Logo – mehr Platz für Strahlen
-  const ringRadius = logoSize * 0.68;   // war 0.78 → jetzt 0.68
-  const ringThickness = 10 + Math.max(...fadeDataArray) / 255 * 8;  // etwas schlanker
+  const ringRadius = logoSize * 0.68;
+  const ringThickness = 10 + Math.max(...fadeDataArray) / 255 * 8;
 
   ctx.beginPath();
   ctx.arc(centerX, centerY, ringRadius, 0, Math.PI * 2);
@@ -879,25 +879,25 @@ function drawRing() {
   ctx.shadowColor = `rgba(0, 255, 255, 0.8)`;
   ctx.stroke();
 
-  // Strahlen mit genug Platz außen
+  // Strahlen dunkelblau
   const rayCount = 120;
   for (let i = 0; i < rayCount; i++) {
     const angle = (i / rayCount) * Math.PI * 2;
     const mirroredIndex = Math.min(i, rayCount - 1 - i);
     const freqIndex = Math.floor((mirroredIndex / rayCount) * bufferLength);
     const amp = fadeDataArray[freqIndex] / 255;
-    const rayLength = amp * (ringRadius * 0.70);  // etwas kürzer → mehr Randplatz
+    const rayLength = amp * (ringRadius * 0.70);
 
     const innerX = centerX + Math.cos(angle) * ringRadius;
     const innerY = centerY + Math.sin(angle) * ringRadius;
     const outerX = centerX + Math.cos(angle) * (ringRadius + rayLength);
     const outerY = centerY + Math.sin(angle) * (ringRadius + rayLength);
 
-    const hue = 180 + (i * 3) % 180;
-    ctx.strokeStyle = `hsla(${hue}, 100%, ${60 + amp * 40}%, ${0.8 + amp * 0.2})`;
+    const hue = 225 + (i * 1.8 % 28) - 14;
+    ctx.strokeStyle = `hsla(${hue}, 98%, ${36 + amp * 34}%, ${0.78 + amp * 0.22})`;
     ctx.lineWidth = 3 + amp * 10;
     ctx.shadowBlur = 25 + amp * 45;
-    ctx.shadowColor = `hsla(${hue}, 100%, 85%, 0.85)`;
+    ctx.shadowColor = `hsla(${hue}, 100%, 68%, 0.88)`;
 
     ctx.beginPath();
     ctx.moveTo(innerX, innerY);

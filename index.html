@@ -259,6 +259,14 @@ button:disabled, button:disabled:hover {
   height: auto;
   object-fit: contain;
 }
+.viz-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 40px 0;
+  box-sizing: border-box;
+}
 .viz-header h2 {
   margin: 0;
   font-size: clamp(1.8rem, 6vw, 2.6rem);
@@ -266,19 +274,24 @@ button:disabled, button:disabled:hover {
   color: #00ffff;
   letter-spacing: 4px;
 }
-.close-viz-btn {
-  position: absolute;
-  top: 25px;
-  right: 40px;
-  font-size: clamp(2.2rem, 8vw, 3rem);
+#vizHeaderControls {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+.viz-header-btn {
+  font-size: 2.2rem;
   background: none;
   border: none;
   color: #ff3366;
   cursor: pointer;
   transition: all 0.3s;
+  padding: 0;
+  line-height: 1;
 }
-.close-viz-btn:hover {
-  transform: rotate(90deg) scale(1.15);
+.viz-header-btn:hover {
+  transform: scale(1.15);
+  color: #ff6699;
 }
 .viz-mode-buttons {
   margin-top: 25px;
@@ -342,13 +355,6 @@ button:disabled, button:disabled:hover {
   opacity: 0.35;
   cursor: not-allowed;
   filter: grayscale(70%);
-}
-#vizDownloadBtn {
-  background: linear-gradient(145deg, rgba(0,255,255,0.2), rgba(145,70,255,0.2));
-  border: 1px solid rgba(0,255,255,0.6);
-}
-#vizDownloadBtn:hover:not(:disabled) {
-  background: linear-gradient(145deg, rgba(0,255,255,0.45), rgba(145,70,255,0.45));
 }
 .viz-select {
   padding: 12px 20px;
@@ -428,6 +434,9 @@ button:disabled, button:disabled:hover {
     gap: 8px;
     justify-content: center;
     padding: 12px;
+  }
+  #vizHeaderControls {
+    gap: 12px;
   }
 }
 @media (max-width: 480px) {
@@ -541,8 +550,13 @@ button:disabled, button:disabled:hover {
 
 <!-- VISUALIZER OVERLAY -->
 <div id="visualizerOverlay">
-  <div class="viz-header"><h2>VENOM VISUALIZER</h2></div>
-  <button id="closeVisualizer" class="close-viz-btn">✕</button>
+  <div class="viz-header">
+    <h2>VENOM VISUALIZER</h2>
+    <div id="vizHeaderControls">
+      <button id="vizFullscreenBtn" class="viz-header-btn">⛶</button> <!-- Vollbild-Button (Icon) -->
+      <button id="closeVisualizer" class="viz-header-btn">✕</button> <!-- Schließen-Button -->
+    </div>
+  </div>
 
   <canvas id="visualizerCanvas"></canvas>
 
@@ -633,6 +647,7 @@ const radioToggle = document.getElementById("radioToggle");
 const visualizerOverlay = document.getElementById('visualizerOverlay');
 const visualizerBtn = document.getElementById('visualizerBtn');
 const closeVisualizer = document.getElementById('closeVisualizer');
+const vizFullscreenBtn = document.getElementById('vizFullscreenBtn');
 const canvas = document.getElementById('visualizerCanvas');
 const ctx = canvas.getContext('2d');
 const modeBtns = document.querySelectorAll('.mode-btn');
@@ -668,6 +683,17 @@ function updateVizDownloadBtn() {
     vizDownloadBtn.onclick = null;
   }
 }
+
+// Vollbild-Button im Visualizer (neben Schließen)
+vizFullscreenBtn.addEventListener('click', () => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(err => {
+      console.error("Vollbild fehlgeschlagen:", err);
+    });
+  } else {
+    document.exitFullscreen();
+  }
+});
 
 // Lautstärke-Synchronisation
 function syncVolumeSliderFromSystem() {

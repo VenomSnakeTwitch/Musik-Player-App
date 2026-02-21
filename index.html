@@ -253,8 +253,8 @@ button:disabled, button:disabled:hover {
   border-radius: 24px;
   box-shadow: 0 0 60px #00ffff88, 0 0 120px #9146ff55;
   background: #00000033 center/cover no-repeat;
-  max-width: 98vw;
-  max-height: 65vh;
+  max-width: 96vw;
+  max-height: 60vh;
   width: 100%;
   height: auto;
   object-fit: contain;
@@ -962,9 +962,9 @@ document.getElementById('themeBtn').onclick = toggleTheme;
 
 // VISUALIZER FUNKTIONEN
 function resizeCanvas() {
-  const maxW = Math.min(window.innerWidth * 0.98, 1400);
-  const maxH = window.innerHeight * 0.70;
-  const ratio = 16 / 9;
+  const maxW = Math.min(window.innerWidth * 0.96, 1200);
+  const maxH = window.innerHeight * 0.60;
+  const ratio = 900 / 620;
   let w = maxW;
   let h = w / ratio;
   if (h > maxH) { h = maxH; w = h * ratio; }
@@ -1018,22 +1018,33 @@ function drawRing() {
 }
 
 function drawWaveform() {
-  const baseY = canvas.height / 2;
+  const midY = canvas.height / 2;
   ctx.beginPath();
-  ctx.moveTo(0, baseY);
 
+  // Obere Welle – von ganz links bis ganz rechts
+  ctx.moveTo(0, midY);
   const sliceWidth = canvas.width / bufferLength;
   let x = 0;
 
   for (let i = 0; i < bufferLength; i++) {
     const v = fadeDataArray[i] / 128.0;
-    const y = baseY - (v * canvas.height * 0.48); // etwas mehr Amplitude
+    const y = midY - (v * canvas.height * 0.45);
     ctx.lineTo(x, y);
     x += sliceWidth;
   }
 
-  ctx.lineTo(canvas.width, baseY);
-  ctx.lineTo(0, baseY);
+  ctx.lineTo(canvas.width, midY);
+
+  // Untere gespiegelte Welle – symmetrisch von rechts nach links
+  x = canvas.width;
+  for (let i = bufferLength - 1; i >= 0; i--) {
+    const v = fadeDataArray[i] / 128.0;
+    const y = midY + (v * canvas.height * 0.45);
+    ctx.lineTo(x, y);
+    x -= sliceWidth;
+  }
+
+  ctx.lineTo(0, midY);
   ctx.closePath();
 
   const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
@@ -1046,24 +1057,24 @@ function drawWaveform() {
 
   ctx.strokeStyle = '#00ffff';
   ctx.lineWidth = 5 + Math.max(...fadeDataArray) / 255 * 8;
-  ctx.shadowBlur = 30;
-  ctx.shadowColor = '#00ffff';
+  ctx.shadowBlur = 35;
+  ctx.shadowColor = '#00ffffaa';
   ctx.stroke();
 }
 
 function drawBars() {
-  const barWidth = canvas.width / bufferLength;
+  const barWidth = canvas.width / bufferLength; // volle Breite ohne Gap
   let x = 0;
 
   for (let i = 0; i < bufferLength; i++) {
-    const height = (fadeDataArray[i] / 255) * canvas.height * 0.88;
+    const height = (fadeDataArray[i] / 255) * canvas.height * 0.92;
 
     const gradient = ctx.createLinearGradient(x, canvas.height - height, x, canvas.height);
-    gradient.addColorStop(0, `hsl(${190 + (i * 1.4)}, 100%, 70%)`);
-    gradient.addColorStop(1, `hsl(${190 + (i * 1.4)}, 100%, 40%)`);
+    gradient.addColorStop(0, `hsl(${190 + i * 1.2}, 100%, 70%)`);
+    gradient.addColorStop(1, `hsl(${190 + i * 1.2}, 100%, 35%)`);
 
     ctx.fillStyle = gradient;
-    ctx.fillRect(x, canvas.height - height, barWidth - 0.5, height);
+    ctx.fillRect(x, canvas.height - height, barWidth, height); // kein Abzug → Rand zu Rand
 
     x += barWidth;
   }
@@ -1073,26 +1084,27 @@ function drawLightning() {
   if (audio.paused || audio.ended || !audio.duration || audio.currentTime === 0) return;
 
   const bass = Math.max(...fadeDataArray.slice(0,40)) / 255;
-  ctx.fillStyle = `rgba(0,255,255,${bass * 0.1})`;
+  ctx.fillStyle = `rgba(0,255,255,${bass * 0.12})`;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  const numBolts = 4 + Math.floor(bass * 12);
+  const numBolts = 4 + Math.floor(bass * 14);
   for (let i = 0; i < numBolts; i++) {
-    let x = Math.random() * canvas.width;
-    let y = 0;
+    let x = Math.random() * canvas.width; // volle Breite
+    let y = Math.random() * canvas.height * 0.3;
 
-    ctx.strokeStyle = `hsl(195, 100%, ${60 + bass * 30}%)`;
-    ctx.lineWidth = 2 + bass * 10;
-    ctx.shadowBlur = 35 + bass * 50;
-    ctx.shadowColor = 'rgba(160,255,255,0.8)';
+    ctx.strokeStyle = `hsl(195, 100%, ${55 + bass * 35}%)`;
+    ctx.lineWidth = 2 + bass * 12;
+    ctx.shadowBlur = 40 + bass * 60;
+    ctx.shadowColor = 'rgba(160,255,255,0.85)';
 
     ctx.beginPath();
     ctx.moveTo(x, y);
 
-    const steps = 12 + Math.floor(bass * 8);
+    const steps = 12 + Math.floor(bass * 10);
     for (let s = 1; s < steps; s++) {
-      y += canvas.height / steps * (0.6 + Math.random() * 0.6);
-      x += (Math.random() - 0.5) * (100 + bass * 220);
+      y += canvas.height / steps * (0.6 + Math.random() * 0.7);
+      x += (Math.random() - 0.5) * (120 + bass * 280);
+      x = Math.max(0, Math.min(canvas.width, x));
       ctx.lineTo(x, y);
     }
 

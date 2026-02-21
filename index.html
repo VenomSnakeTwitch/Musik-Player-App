@@ -257,11 +257,130 @@ button:disabled, button:disabled:hover {
   height: auto;
   object-fit: contain;
 }
-/* Light Mode Overrides */
-[data-theme="light"] #overlay { background: var(--bg-light); }
-[data-theme="light"] header { background: rgba(255,255,255,0.75); }
-[data-theme="light"] body { color: var(--text-light); }
-[data-theme="light"] h1, [data-theme="light"] #currentSong { color: #1a1a40; text-shadow: 0 0 8px rgba(65,105,225,0.5); }
+.viz-header h2 {
+  margin: 0;
+  font-size: clamp(1.8rem, 6vw, 2.6rem);
+  text-shadow: 0 0 25px #00ffff;
+  color: #00ffff;
+  letter-spacing: 4px;
+}
+.close-viz-btn {
+  position: absolute;
+  top: 25px;
+  right: 40px;
+  font-size: clamp(2.2rem, 8vw, 3rem);
+  background: none;
+  border: none;
+  color: #ff3366;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.close-viz-btn:hover {
+  transform: rotate(90deg) scale(1.15);
+}
+.viz-mode-buttons {
+  margin-top: 25px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.mode-btn {
+  padding: clamp(8px, 2.5vw, 10px) clamp(16px, 4vw, 24px);
+  font-size: clamp(0.9rem, 3vw, 1.05rem);
+  background: rgba(0,0,60,0.6);
+  border: 2px solid #00ffff;
+  color: #fff;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.mode-btn:hover {
+  background: rgba(145,70,255,0.4);
+}
+.mode-btn.active {
+  background: linear-gradient(90deg, #9146ff, #00ffff);
+  border-color: #ffffff;
+  box-shadow: 0 0 30px #00ffff;
+}
+#vizControls {
+  margin-top: 22px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(0,0,40,0.92);
+  padding: 10px 18px;
+  border-radius: 50px;
+  border: 2px solid #00ffff55;
+  box-shadow: 0 0 40px rgba(0,255,255,0.3);
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.viz-btn {
+  width: 48px;
+  height: 48px;
+  font-size: 1.65rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,60,0.8);
+  border: 3px solid #00ffff;
+  color: #fff;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+#vizPlayPauseBtn {
+  width: 62px;
+  height: 62px;
+  font-size: 2.15rem;
+}
+#vizDownloadBtn {
+  width: 62px;
+  height: 62px;
+  font-size: 1.8rem;
+  background: rgba(0,0,60,0.8);
+  border: 3px solid #00ffff;
+  color: #fff;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+#vizDownloadBtn:hover:not(:disabled) {
+  background: rgba(145,70,255,0.6);
+  border-color: #ffffff;
+}
+#vizDownloadBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.viz-select {
+  padding: 11px 18px;
+  font-size: 0.98rem;
+  background: rgba(0,0,60,0.85);
+  border: 2px solid #00ffff;
+  color: #fff;
+  border-radius: 14px;
+  min-width: 220px;
+}
+#vizVersion {
+  position: absolute;
+  bottom: 18px;
+  right: 24px;
+  font-size: 0.95rem;
+  color: #88f0ff;
+  opacity: 0.7;
+  text-shadow: 0 0 8px #00ffff, 0 0 14px #9146ff;
+  pointer-events: none;
+  letter-spacing: 1px;
+  font-weight: bold;
+  z-index: 10;
+}
+[data-theme="light"] #vizVersion {
+  color: #4169e1;
+  text-shadow: 0 0 6px #4169e1;
+  opacity: 0.8;
+}
 /* Responsive Anpassungen für Android */
 @media (max-width: 768px) {
   header {
@@ -305,6 +424,12 @@ button:disabled, button:disabled:hover {
   }
   #visualizerCanvas {
     max-height: 55vh;
+  }
+  #vizControls {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
   }
 }
 @media (max-width: 480px) {
@@ -415,23 +540,29 @@ button:disabled, button:disabled:hover {
     </div>
   </div>
 </div>
+
 <!-- VISUALIZER OVERLAY -->
 <div id="visualizerOverlay">
   <div class="viz-header"><h2>VENOM VISUALIZER</h2></div>
   <button id="closeVisualizer" class="close-viz-btn">✕</button>
+
   <canvas id="visualizerCanvas"></canvas>
+
   <div class="viz-mode-buttons">
     <button class="mode-btn" data-mode="0">RING</button>
     <button class="mode-btn" data-mode="1">WAVE</button>
     <button class="mode-btn active" data-mode="2">BARS</button>
     <button class="mode-btn" data-mode="3">⚡ BLITZ</button>
   </div>
+
   <div id="vizControls">
     <button onclick="prevSong()" class="viz-btn">⏮</button>
     <button id="vizPlayPauseBtn" onclick="togglePlay()" class="viz-btn">▶</button>
+    <button id="vizDownloadBtn" class="viz-btn" disabled>↓</button> <!-- NEU: Download im Visualizer -->
     <button onclick="nextSong()" class="viz-btn">⏭</button>
     <select id="vizSongSelect" onchange="selectSongFromViz()" class="viz-select"></select>
   </div>
+
   <div id="vizVersion">Visualizer v4.5</div>
 </div>
 
@@ -508,6 +639,7 @@ const canvas = document.getElementById('visualizerCanvas');
 const ctx = canvas.getContext('2d');
 const modeBtns = document.querySelectorAll('.mode-btn');
 const vizPlayPauseBtn = document.getElementById('vizPlayPauseBtn');
+const vizDownloadBtn = document.getElementById('vizDownloadBtn'); // NEU
 const vizSongSelect = document.getElementById('vizSongSelect');
 
 let audioContext = null;
@@ -521,7 +653,25 @@ let vizMode = 2;
 const logoImg = new Image();
 logoImg.src = "https://raw.githubusercontent.com/VenomSnakeTwitch/VenomSnake_Twitch-Webseite/main/DogVenomsnakeLogo.png";
 
-// Verbesserte Lautstärke-Synchronisation (Hardware-Tasten + System-Regler)
+// Download-Button im Visualizer aktualisieren
+function updateVizDownloadBtn() {
+  if (audio.src && !audio.paused && !audio.ended) {
+    vizDownloadBtn.disabled = false;
+    vizDownloadBtn.onclick = () => {
+      const a = document.createElement('a');
+      a.href = audio.src;
+      a.download = songs[currentIndex];
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    };
+  } else {
+    vizDownloadBtn.disabled = true;
+    vizDownloadBtn.onclick = null;
+  }
+}
+
+// Lautstärke-Synchronisation (vorheriger Code bleibt)
 function syncVolumeSliderFromSystem() {
   const currentVolume = audio.volume;
   if (Math.abs(currentVolume - parseFloat(volumeSlider.value)) > 0.01) {
@@ -538,7 +688,7 @@ function startVolumePolling() {
     if (!audio.paused && !audio.ended) {
       syncVolumeSliderFromSystem();
     }
-  }, 150); // 150 ms – schnell & akkuschonend
+  }, 150);
 }
 
 function stopVolumePolling() {
@@ -548,12 +698,10 @@ function stopVolumePolling() {
   }
 }
 
-// Events zum Starten/Stoppen des Polling
 audio.addEventListener('play', startVolumePolling);
 audio.addEventListener('pause', stopVolumePolling);
 audio.addEventListener('ended', stopVolumePolling);
 
-// Zusätzliche Syncs
 volumeSlider.addEventListener('input', () => {
   audio.volume = parseFloat(volumeSlider.value);
 });
@@ -593,6 +741,7 @@ function togglePlay() {
     audio.play().then(() => {
       playPauseBtn.textContent = "⏸ Pause";
       vizPlayPauseBtn.textContent = "⏸";
+      updateVizDownloadBtn(); // NEU
     }).catch(e => {
       console.error("Play-Fehler:", e);
     });
@@ -600,6 +749,7 @@ function togglePlay() {
     audio.pause();
     playPauseBtn.textContent = "▶ Play";
     vizPlayPauseBtn.textContent = "▶";
+    updateVizDownloadBtn(); // NEU
   }
 }
 
@@ -614,6 +764,7 @@ function loadSong(index) {
   downloadBtn.href = url;
   downloadBtn.setAttribute("download", fileName);
   document.getElementById("currentSong").textContent = "▶ " + songSelect.options[index].text;
+  updateVizDownloadBtn(); // NEU: Visualizer-Download aktualisieren
 }
 
 function selectSong() {
@@ -648,6 +799,7 @@ function stopSong() {
   audio.currentTime = 0;
   playPauseBtn.textContent = "▶ Play";
   vizPlayPauseBtn.textContent = "▶";
+  updateVizDownloadBtn(); // NEU
 }
 
 function toggleRadioMode() {
@@ -867,6 +1019,7 @@ function startVisualizer() {
   resumeAudioContext();
   resizeCanvas();
   if (!animationId) drawVisualizer();
+  updateVizDownloadBtn(); // NEU: beim Öffnen aktualisieren
 }
 
 function stopVisualizer() {

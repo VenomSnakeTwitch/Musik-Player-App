@@ -4,7 +4,7 @@
   "description": "Musikplayer mit Visualizer und Suno-Tracks von VenomSnake_Twitch",
   "start_url": "https://venomsnaketwitch.github.io/Musik-Player-App/index.html",
   "scope": "https://venomsnaketwitch.github.io/Musik-Player-App/",
-  "display": "standalone",
+  "display": "fullscreen",
   "background_color": "#000033",
   "theme_color": "#9146ff",
   "orientation": "any",

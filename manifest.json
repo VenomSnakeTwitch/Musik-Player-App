@@ -2,10 +2,10 @@
   "background_color": "#ffffff",
   "dir": "ltr",
   "display": "standalone",
-  "name": "venomsnaketwitch.github",
+  "name": "VenomSnake Musik Player",
   "orientation": "any",
   "scope": "/",
-  "short_name": "venomsnaketwitch.github",
+  "short_name": "VenomPlayer",
   "start_url": "/index.html",
   "theme_color": "#9146ff",
   "icons": [

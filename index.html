@@ -264,7 +264,7 @@ button:disabled, button:disabled:hover {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 72px 0 24px;
+  padding: 20px 24px 0 24px;
   box-sizing: border-box;
 }
 .viz-header h2 {
@@ -276,7 +276,7 @@ button:disabled, button:disabled:hover {
 }
 #vizHeaderControls {
   display: flex;
-  gap: 8px;
+  gap: 12px;
   align-items: center;
 }
 .viz-options-select {
@@ -298,9 +298,8 @@ button:disabled, button:disabled:hover {
   box-shadow: 0 6px 20px rgba(0,255,255,0.4);
 }
 #closeVisualizer {
-  position: absolute;
-  top: 20px;
-  right: 24px;
+  position: static;
+  margin-left: 16px;
   background: linear-gradient(145deg, rgba(255,51,102,0.25), rgba(255,102,153,0.15));
   border: 1px solid #ff3366;
   padding: 10px 16px;
@@ -378,13 +377,14 @@ button:disabled, button:disabled:hover {
 }
 @media (max-width: 768px) {
   #visualizerCanvas { max-height: 58vh; }
-  .viz-header { padding: 18px 62px 0 18px; }
-  #closeVisualizer { top: 18px; right: 18px; padding: 8px 14px; font-size: 1.35rem; }
+  .viz-header { padding: 18px 18px 0 18px; }
+  #closeVisualizer { margin-left: 12px; padding: 8px 14px; font-size: 1.35rem; }
   .viz-options-select { min-width: 135px; padding: 8px 14px; font-size: 0.95rem; }
 }
 @media (max-width: 480px) {
-  .viz-header { padding: 16px 58px 0 16px; }
-  #closeVisualizer { top: 16px; right: 16px; padding: 7px 13px; font-size: 1.3rem; }
+  .viz-header { padding: 16px 16px 0 16px; }
+  #closeVisualizer { margin-left: 10px; padding: 7px 13px; font-size: 1.3rem; }
+  .viz-options-select { min-width: 120px; }
 }
 </style>
 </head>
@@ -416,7 +416,7 @@ button:disabled, button:disabled:hover {
       <option value="7">Yu-Gi-Oh! Master Duel Solo Gate Theme Synth Mix</option>
       <option value="8">Bye Bye Beautiful</option>
       <option value="9">Kettenreaktion (Cover)</option>
-      <option value="10">Straße der Verdammnis</option>
+      <option value="10">Strasse der Verdammnis</option>
       <option value="11">Syphon Filter Synth Mix</option>
       <option value="12">VenomSnake Mode Intro song</option>
       <option value="13">Hell March [Retaliation Cover]</option>
@@ -497,8 +497,8 @@ button:disabled, button:disabled:hover {
         <option value="background">Hintergrund ändern</option>
         <option value="reset" id="vizResetOption" style="display:none;">Hintergrund zurücksetzen</option>
       </select>
+      <button id="closeVisualizer">✕</button>
     </div>
-    <button id="closeVisualizer" class="viz-header-btn">✕</button>
   </div>
   <input type="file" id="bgFileInput" accept="image/*" style="display:none;">
   <canvas id="visualizerCanvas"></canvas>

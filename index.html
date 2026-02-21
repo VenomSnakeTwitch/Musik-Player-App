@@ -502,6 +502,7 @@ button:disabled, button:disabled:hover {
     </div>
   </div>
 </div>
+
 <!-- VISUALIZER OVERLAY -->
 <div id="visualizerOverlay">
   <div class="viz-header">
@@ -517,8 +518,8 @@ button:disabled, button:disabled:hover {
   <canvas id="visualizerCanvas"></canvas>
   <div class="viz-mode-buttons">
     <button class="mode-btn" data-mode="0">RING</button>
-    <button class="mode-btn" data-mode="1">WAVE</button>
-    <button class="mode-btn active" data-mode="2">BARS</button>
+    <button class="mode-btn active" data-mode="1">WAVE</button>
+    <button class="mode-btn" data-mode="2">BARS</button>
     <button class="mode-btn" data-mode="3">⚡ BLITZ</button>
   </div>
   <div id="vizControls">
@@ -596,7 +597,7 @@ const downloadBtn = document.getElementById("downloadBtn");
 const loopBtn = document.getElementById("loopBtn");
 const radioToggle = document.getElementById("radioToggle");
 
-// VISUALIZER
+// VISUALIZER VARIABLES
 const visualizerOverlay = document.getElementById('visualizerOverlay');
 const visualizerBtn = document.getElementById('visualizerBtn');
 const closeVisualizer = document.getElementById('closeVisualizer');
@@ -617,18 +618,19 @@ let bufferLength = 0;
 let dataArray = null;
 let fadeDataArray = null;
 let animationId = null;
-let vizMode = 2;
+let vizMode = 1; // Start mit WAVE
 
 const logoImg = new Image();
 logoImg.src = "https://raw.githubusercontent.com/VenomSnakeTwitch/VenomSnake_Twitch-Webseite/main/DogVenomsnakeLogo.png";
 
 // Hintergrund-Upload
-vizBgUploadBtn.addEventListener('click', () => { bgFileInput.click(); });
-bgFileInput.addEventListener('change', (e) => {
+vizBgUploadBtn.addEventListener('click', () => bgFileInput.click());
+
+bgFileInput.addEventListener('change', e => {
   const file = e.target.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = function(event) {
+  reader.onload = event => {
     const bgUrl = event.target.result;
     canvas.style.backgroundImage = `url(${bgUrl})`;
     canvas.style.backgroundSize = 'cover';
@@ -701,10 +703,8 @@ function startVolumePolling() {
 }
 
 function stopVolumePolling() {
-  if (volumePollingInterval) {
-    clearInterval(volumePollingInterval);
-    volumePollingInterval = null;
-  }
+  if (volumePollingInterval) clearInterval(volumePollingInterval);
+  volumePollingInterval = null;
 }
 
 audio.addEventListener('play', startVolumePolling);
@@ -740,12 +740,11 @@ function initAudioContext() {
 
 function resumeAudioContext() {
   if (!audioContext) initAudioContext();
-  if (audioContext.state === 'suspended') {
-    audioContext.resume();
-  }
+  if (audioContext.state === 'suspended') audioContext.resume();
 }
 
-// Play/Pause
+// Play/Pause, loadSong, selectSong, nextSong, prevSong, stopSong, toggleRadioMode, toggleFullscreen, loopBtn, timeupdate, ended, updateLoopButtonState, toggleTheme – bleiben identisch wie vorher
+
 function togglePlay() {
   resumeAudioContext();
   if (audio.paused || audio.ended) {
@@ -762,7 +761,6 @@ function togglePlay() {
   }
 }
 
-// Song laden
 function loadSong(index) {
   currentIndex = index;
   const fileName = songs[index];
@@ -861,7 +859,6 @@ function updateLoopButtonState() {
   if (radioMode) loopBtn.classList.remove("active");
 }
 
-// Dark Mode
 function toggleTheme() {
   const current = document.documentElement.getAttribute('data-theme') || 'dark';
   const next = current === 'dark' ? 'light' : 'dark';
@@ -878,7 +875,9 @@ if (savedTheme) {
 
 document.getElementById('themeBtn').onclick = toggleTheme;
 
-// VISUALIZER FUNKTIONEN – Ghost-Effekt entfernt
+// ────────────────────────────────────────────────────────────────
+// VISUALIZER FUNKTIONEN – NEU IMPLEMENTIERT (Wave, Bars, Blitz)
+// ────────────────────────────────────────────────────────────────
 
 function resizeCanvas() {
   canvas.width = visualizerOverlay.clientWidth;
@@ -929,102 +928,171 @@ function drawRing() {
   ctx.restore();
 }
 
-function drawWaveform() {
-  // KEIN Abdunkeln → kein Ghost
-  const baseY = canvas.height;
-  ctx.beginPath();
-  ctx.moveTo(0, baseY);
-  const sliceWidth = canvas.width / bufferLength;
-  let x = 0;
-  for (let i = 0; i < bufferLength; i++) {
-    const v = fadeDataArray[i] / 128.0;
-    const y = baseY - (v * canvas.height * 0.96);
-    ctx.lineTo(x, y);
-    x += sliceWidth;
-  }
-  ctx.lineTo(canvas.width, baseY);
-  ctx.lineTo(0, baseY);
-  ctx.closePath();
+// ─── NEUE WAVE ───────────────────────────────────────────────────────
+function drawNewWave() {
+  const time = performance.now() * 0.001;
+  const centerY = canvas.height / 2;
+  const amplitude = canvas.height * 0.35;
+  const frequencyBase = 0.0008;
 
-  const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-  gradient.addColorStop(0,   'rgba(0, 255, 255, 0.65)');
-  gradient.addColorStop(0.45, 'rgba(145, 70, 255, 0.45)');
-  gradient.addColorStop(1,   'rgba(0, 255, 255, 0.08)');
-  ctx.fillStyle = gradient;
-  ctx.fill();
-
-  ctx.strokeStyle = '#00ffff';
-  ctx.lineWidth = 5 + Math.max(...fadeDataArray) / 255 * 8;
-  ctx.shadowBlur = 25;
-  ctx.shadowColor = '#00ffff88';
-  ctx.stroke();
-}
-
-function drawBars() {
-  // KEIN Abdunkeln → kein Ghost
-  const barWidth = canvas.width / bufferLength;
-  let x = 0;
-  for (let i = 0; i < bufferLength; i++) {
-    const height = (fadeDataArray[i] / 255) * canvas.height * 0.96;
-    const gradient = ctx.createLinearGradient(x, canvas.height - height, x, canvas.height);
-    gradient.addColorStop(0, `hsla(${190 + i * 1.4}, 100%, 72%, 0.75)`);
-    gradient.addColorStop(1, `hsla(${190 + i * 1.4}, 100%, 30%, 0.45)`);
-    ctx.fillStyle = gradient;
-    ctx.fillRect(x, canvas.height - height, barWidth - 1, height);
-    x += barWidth;
-  }
-}
-
-function drawLightning() {
-  if (audio.paused || audio.ended || !audio.duration || audio.currentTime === 0) return;
-  // KEIN Abdunkeln → kein Ghost
-  const bass = Math.max(...fadeDataArray.slice(0,50)) / 255;
-  const flashOpacity = bass * 0.12;
-  ctx.fillStyle = `rgba(0,255,255,${flashOpacity})`;
+  // Hintergrund leicht abdunkeln (sehr sanft, fast unsichtbar)
+  ctx.fillStyle = 'rgba(0,0,0,0.04)';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-  const numBolts = 4 + Math.floor(bass * 14);
-  for (let i = 0; i < numBolts; i++) {
-    let x = Math.random() * canvas.width;
-    let y = canvas.height * 0.4 + Math.random() * canvas.height * 0.6;
-    ctx.strokeStyle = `hsl(195, 100%, ${55 + bass * 35}%)`;
-    ctx.lineWidth = 2.5 + bass * 12;
-    ctx.shadowBlur = 40 + bass * 50;
-    ctx.shadowColor = 'rgba(180,255,255,0.7)';
+  for (let layer = 0; layer < 4; layer++) {
+    const offset = layer * 0.15;
+    const alpha = 0.25 - layer * 0.04;
+    const hueShift = layer * 40 + time * 20;
+
     ctx.beginPath();
-    ctx.moveTo(x, y);
-    const steps = 12 + Math.floor(bass * 10);
-    for (let s = 1; s < steps; s++) {
-      y += (canvas.height / steps) * (0.5 + Math.random() * 0.8);
-      x += (Math.random() - 0.5) * (160 + bass * 300);
-      x = Math.max(0, Math.min(canvas.width, x));
+    ctx.moveTo(0, centerY);
+
+    for (let x = 0; x <= canvas.width; x += 4) {
+      const normX = x / canvas.width;
+      const freq = frequencyBase * (1 + normX * 3 + layer * 0.8);
+      const y = centerY + Math.sin(normX * Math.PI * 6 + time * 1.2 + offset) * amplitude * (0.6 + Math.sin(time * 0.7 + layer) * 0.4);
       ctx.lineTo(x, y);
     }
+
+    ctx.lineTo(canvas.width, canvas.height);
+    ctx.lineTo(0, canvas.height);
+    ctx.closePath();
+
+    const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+    gradient.addColorStop(0,   `hsla(${200 + hueShift}, 90%, 70%, ${alpha * 0.9})`);
+    gradient.addColorStop(0.5, `hsla(${240 + hueShift}, 85%, 55%, ${alpha * 0.7})`);
+    gradient.addColorStop(1,   `hsla(${280 + hueShift}, 80%, 40%, ${alpha * 0.3})`);
+
+    ctx.fillStyle = gradient;
+    ctx.fill();
+
+    ctx.strokeStyle = `hsla(${220 + hueShift}, 100%, 80%, ${alpha * 0.6})`;
+    ctx.lineWidth = 3 + layer;
+    ctx.shadowBlur = 30 + layer * 15;
+    ctx.shadowColor = `hsla(${220 + hueShift}, 100%, 80%, 0.5)`;
     ctx.stroke();
+  }
+}
+
+// ─── NEUE BARS ───────────────────────────────────────────────────────
+function drawNewBars() {
+  const centerX = canvas.width / 2;
+  const centerY = canvas.height / 2;
+  const maxHeight = canvas.height * 0.45;
+  const barCount = 64;
+  const barWidth = canvas.width / barCount * 1.2;
+
+  // Sehr sanftes Abdunkeln (fast unsichtbar)
+  ctx.fillStyle = 'rgba(0,0,0,0.03)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  for (let i = 0; i < barCount; i++) {
+    const angle = (i / barCount) * Math.PI * 2;
+    const index = Math.floor((i / barCount) * bufferLength);
+    const amp = fadeDataArray[index] / 255;
+    const height = maxHeight * amp * (0.8 + Math.sin(performance.now() * 0.002 + i * 0.3) * 0.2);
+
+    const x = centerX + Math.cos(angle) * (canvas.width * 0.38);
+    const y = centerY + Math.sin(angle) * (canvas.height * 0.38);
+
+    const hue = 190 + i * 2.8 + performance.now() * 0.02;
+    const gradient = ctx.createRadialGradient(x, y, 0, x, y, height * 1.4);
+    gradient.addColorStop(0, `hsla(${hue}, 100%, 75%, 0.9)`);
+    gradient.addColorStop(0.6, `hsla(${hue + 40}, 90%, 55%, 0.5)`);
+    gradient.addColorStop(1,   `hsla(${hue + 80}, 80%, 35%, 0.05)`);
+
+    ctx.fillStyle = gradient;
+    ctx.fillRect(x - barWidth/2, y - height/2, barWidth, height);
+
+    // Glow-Ring
+    ctx.strokeStyle = `hsla(${hue}, 100%, 85%, 0.4)`;
+    ctx.lineWidth = 3;
+    ctx.shadowBlur = 25;
+    ctx.shadowColor = `hsla(${hue}, 100%, 80%, 0.7)`;
+    ctx.beginPath();
+    ctx.arc(x, y, height * 0.55, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+}
+
+// ─── NEUER BLITZ ─────────────────────────────────────────────────────
+function drawNewBlitz() {
+  const bass = Math.max(...fadeDataArray.slice(0, 80)) / 255;
+  const time = performance.now() * 0.001;
+
+  // Sehr sanftes Abdunkeln
+  ctx.fillStyle = 'rgba(0,0,0,0.035)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Blitz-ähnliche Strahlen
+  const boltCount = 5 + Math.floor(bass * 18);
+  for (let i = 0; i < boltCount; i++) {
+    let x = Math.random() * canvas.width;
+    let y = Math.random() * canvas.height * 0.35;
+    const length = canvas.height * (0.6 + bass * 0.6);
+    const segments = 8 + Math.floor(bass * 12);
+
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+
+    for (let s = 1; s <= segments; s++) {
+      const progress = s / segments;
+      y += length / segments * (0.8 + Math.random() * 0.6);
+      x += (Math.random() - 0.5) * (canvas.width * 0.3 + bass * canvas.width * 0.8);
+      x = Math.max(20, Math.min(canvas.width - 20, x));
+      ctx.lineTo(x, y);
+    }
+
+    const hue = 190 + bass * 60 + Math.sin(time * 3 + i) * 30;
+    ctx.strokeStyle = `hsla(${hue}, 100%, ${70 + bass * 30}%, ${0.5 + bass * 0.4})`;
+    ctx.lineWidth = 2.5 + bass * 8;
+    ctx.shadowBlur = 40 + bass * 80;
+    ctx.shadowColor = `hsla(${hue}, 100%, 85%, 0.8)`;
+    ctx.stroke();
+
+    // Sekundärer Glow-Strahl (leichter Nachhall)
+    ctx.strokeStyle = `hsla(${hue + 20}, 90%, 80%, ${0.15 + bass * 0.25})`;
+    ctx.lineWidth = 6 + bass * 12;
+    ctx.shadowBlur = 80 + bass * 120;
+    ctx.shadowColor = `hsla(${hue}, 100%, 90%, 0.6)`;
+    ctx.stroke();
+  }
+
+  // Leichter zentraler Puls
+  if (bass > 0.4) {
+    const pulseRadius = canvas.width * 0.15 + bass * canvas.width * 0.35;
+    const gradient = ctx.createRadialGradient(canvas.width/2, canvas.height/2, 0, canvas.width/2, canvas.height/2, pulseRadius);
+    gradient.addColorStop(0, `rgba(0,255,255,${bass * 0.35})`);
+    gradient.addColorStop(0.7, `rgba(145,70,255,${bass * 0.12})`);
+    gradient.addColorStop(1,   'rgba(0,0,0,0)');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
   }
 }
 
 function drawVisualizer() {
   animationId = requestAnimationFrame(drawVisualizer);
 
-  // Nur Ring braucht clearRect – die anderen Modi bleiben transparent (kein Ghost)
+  // Für RING: kompletter Clear
   if (vizMode === 0) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
 
+  // Daten aktualisieren
   if (audio.paused || audio.ended || audio.currentTime === 0) {
     for (let i = 0; i < bufferLength; i++) {
-      fadeDataArray[i] *= 0.94;
+      fadeDataArray[i] *= 0.92;
       if (fadeDataArray[i] < 1) fadeDataArray[i] = 0;
     }
   } else {
     analyser.getByteFrequencyData(fadeDataArray);
   }
 
+  // Modi aufrufen
   if      (vizMode === 0) drawRing();
-  else if (vizMode === 1) drawWaveform();
-  else if (vizMode === 2) drawBars();
-  else                    drawLightning();
+  else if (vizMode === 1) drawNewWave();
+  else if (vizMode === 2) drawNewBars();
+  else if (vizMode === 3) drawNewBlitz();
 }
 
 function startVisualizer() {

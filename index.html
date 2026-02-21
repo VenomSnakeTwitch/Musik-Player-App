@@ -259,11 +259,12 @@ button:disabled, button:disabled:hover {
   object-fit: contain;
 }
 .viz-header {
+  position: relative; /* wichtig für absolute Close-Button */
   width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 24px 0;
+  padding: 20px 72px 0 24px; /* viel Platz rechts für den absolut positionierten X-Button */
   box-sizing: border-box;
 }
 .viz-header h2 {
@@ -275,12 +276,12 @@ button:disabled, button:disabled:hover {
 }
 #vizHeaderControls {
   display: flex;
-  gap: 12px;
+  gap: 8px;
   align-items: center;
 }
 .viz-header-btn {
-  padding: 10px 18px;
-  font-size: 1.1rem;
+  padding: 9px 14px;
+  font-size: 1rem;
   background: linear-gradient(145deg, rgba(0,255,255,0.15), rgba(145,70,255,0.15));
   border: 1px solid rgba(0,255,255,0.5);
   color: #fff;
@@ -289,7 +290,7 @@ button:disabled, button:disabled:hover {
   transition: all 0.3s ease;
   text-shadow: 0 0 8px rgba(0,255,255,0.6);
   box-shadow: 0 3px 12px rgba(0,0,0,0.4);
-  min-width: 60px;
+  min-width: 55px;
 }
 .viz-header-btn:hover {
   background: linear-gradient(145deg, rgba(0,255,255,0.35), rgba(145,70,255,0.35));
@@ -298,11 +299,14 @@ button:disabled, button:disabled:hover {
   box-shadow: 0 6px 20px rgba(0,255,255,0.4);
 }
 #closeVisualizer {
+  position: absolute; /* fixiert oben rechts – wird nie mehr abgeschnitten */
+  top: 20px;
+  right: 24px;
   background: linear-gradient(145deg, rgba(255,51,102,0.25), rgba(255,102,153,0.15));
   border: 1px solid #ff3366;
   padding: 10px 16px;
   font-size: 1.4rem;
-  margin-left: 8px;
+  z-index: 10;
 }
 #closeVisualizer:hover {
   background: linear-gradient(145deg, rgba(255,51,102,0.45), rgba(255,102,153,0.35));
@@ -375,7 +379,33 @@ button:disabled, button:disabled:hover {
 }
 @media (max-width: 768px) {
   #visualizerCanvas { max-height: 58vh; }
-  .viz-header { padding: 18px 18px 0; }
+  .viz-header { 
+    padding: 18px 62px 0 18px; 
+  }
+  #closeVisualizer {
+    top: 18px;
+    right: 18px;
+    padding: 8px 14px;
+    font-size: 1.35rem;
+  }
+}
+@media (max-width: 480px) {
+  .viz-header { 
+    padding: 16px 58px 0 16px; 
+  }
+  #closeVisualizer {
+    top: 16px;
+    right: 16px;
+    padding: 7px 13px;
+    font-size: 1.3rem;
+  }
+  #vizHeaderControls {
+    gap: 6px;
+  }
+  .viz-header-btn {
+    padding: 7px 11px;
+    font-size: 0.92rem;
+  }
 }
 </style>
 </head>
@@ -859,7 +889,7 @@ function drawRing() {
   const centerX = canvas.width / 2;
   const centerY = canvas.height / 2;
 
-  const logoBase = Math.min(canvas.width, canvas.height) * 0.58;
+  const logoBase = Math.min(canvas.width, canvas.height) * 0.56;
   const logoSize = logoBase;
 
   if (logoImg.complete) {
@@ -868,8 +898,8 @@ function drawRing() {
     ctx.drawImage(logoImg, centerX - logoSize/2, centerY - logoSize/2, logoSize, logoSize);
   }
 
-  const ringRadius = logoSize * 0.68;
-  const ringThickness = 10 + Math.max(...fadeDataArray) / 255 * 8;
+  const ringRadius = logoSize * 0.65;
+  const ringThickness = 9 + Math.max(...fadeDataArray) / 255 * 8;
 
   ctx.beginPath();
   ctx.arc(centerX, centerY, ringRadius, 0, Math.PI * 2);
@@ -880,7 +910,7 @@ function drawRing() {
   ctx.stroke();
 
   // Strahlen dunkelblau
-  const rayCount = 120;
+  const rayCount = 110;
   for (let i = 0; i < rayCount; i++) {
     const angle = (i / rayCount) * Math.PI * 2;
     const mirroredIndex = Math.min(i, rayCount - 1 - i);

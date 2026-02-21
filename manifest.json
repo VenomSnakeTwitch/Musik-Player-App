@@ -1,0 +1,25 @@
+{
+  "name": "VenomSnake Musikplayer",
+  "short_name": "VenomPlayer",
+  "description": "VenomSnake_Twitch's Musikplayer mit Visualizer und Radio-Modus",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#000033",
+  "theme_color": "#9146ff",
+  "categories": ["music", "entertainment"],
+  "icons": [
+    {
+      "src": "DogVenomsnakeLogo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "DogVenomsnakeLogo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

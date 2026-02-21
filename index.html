@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
 <!-- PWA Essentials -->
 <meta name="theme-color" content="#9146ff">
 <meta name="background-color" content="#000033">
@@ -12,17 +11,15 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="icon" type="image/x-icon" href="favicon.ico">
-
-<!-- Zusätzliche Meta-Tags für besseren Standalone-Modus (neu) -->
+<!-- Zusätzliche Meta-Tags für besseren Standalone-Modus -->
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  
+
 <title>VenomSnake Musikplayer</title>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
-
 :root {
   --accent: #00ffff;
   --accent-dark: #9146ff;
@@ -31,12 +28,10 @@
   --bg-light: rgba(245,245,255,0.88);
   --text-light: #1a1a40;
 }
-
 [data-theme="light"] {
   --bg-overlay: var(--bg-light);
   --text-main: var(--text-light);
 }
-
 body {
   margin: 0;
   padding: 0;
@@ -49,7 +44,6 @@ body {
   overflow-x: hidden;
   touch-action: manipulation;
 }
-
 header {
   position: fixed;
   top: 0;
@@ -64,29 +58,24 @@ header {
   box-sizing: border-box;
   z-index: 1000;
 }
-
 header .logo-container {
   display: flex;
   align-items: center;
   gap: clamp(6px, 2vw, 10px);
 }
-
 header .logo-container img {
   height: clamp(35px, 8vw, 45px);
   object-fit: contain;
 }
-
 header .logo-container span {
   font-size: clamp(18px, 5vw, 24px);
   font-weight: bold;
   color: #9146ff;
   text-shadow: 0px 0px 8px #00ffff;
 }
-
 header .logo-container span .snake {
   color: #00ffff;
 }
-
 #overlay {
   background: var(--bg-overlay);
   width: 100%;
@@ -97,14 +86,12 @@ header .logo-container span .snake {
   padding: clamp(70px, 15vh, 100px) clamp(12px, 4vw, 24px) clamp(20px, 5vh, 40px);
   box-sizing: border-box;
 }
-
 h1 {
   font-size: clamp(24px, 8vw, 38px);
   margin: 0 0 8px 0;
   color: #ffffff;
   text-shadow: 0 0 12px #00ffff, 0 0 24px #000044;
 }
-
 #infoText {
   margin-top: 8px;
   font-size: clamp(14px, 3.5vw, 16px);
@@ -112,13 +99,11 @@ h1 {
   max-width: 90%;
   line-height: 1.4;
 }
-
 audio {
   width: 100%;
   max-width: 90vw;
   margin-top: 16px;
 }
-
 button, select, #downloadBtn {
   margin: clamp(6px, 1.5vw, 8px);
   padding: clamp(10px, 3vw, 12px) clamp(12px, 4vw, 16px);
@@ -132,13 +117,11 @@ button, select, #downloadBtn {
   touch-action: manipulation;
   min-width: 100px;
 }
-
 button:hover, #downloadBtn:hover, select:hover {
   border-color: var(--accent-dark);
   background: rgba(20,20,80,0.9);
   color: var(--accent);
 }
-
 button:disabled, button:disabled:hover {
   opacity: 0.45;
   cursor: not-allowed;
@@ -146,7 +129,6 @@ button:disabled, button:disabled:hover {
   color: #888;
   background: rgba(0,0,30,0.7);
 }
-
 #songControls, #controls, #progressContainer {
   margin-top: 12px;
   display: flex;
@@ -156,7 +138,6 @@ button:disabled, button:disabled:hover {
   width: 100%;
   max-width: 95vw;
 }
-
 #progress {
   -webkit-appearance: none;
   appearance: none;
@@ -167,7 +148,6 @@ button:disabled, button:disabled:hover {
   cursor: pointer;
   outline: none;
 }
-
 #progress::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
@@ -179,7 +159,6 @@ button:disabled, button:disabled:hover {
   cursor: pointer;
   margin-top: -5px;
 }
-
 #progress::-moz-range-thumb {
   width: clamp(16px, 4vw, 20px);
   height: clamp(16px, 4vw, 20px);
@@ -188,21 +167,18 @@ button:disabled, button:disabled:hover {
   border: 2px solid var(--accent);
   cursor: pointer;
 }
-
 #volumeContainer {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4px;
 }
-
 #volumeContainer input[type="range"] {
   writing-mode: bt-lr;
   -webkit-appearance: slider-vertical;
   width: 8px;
   height: 100px;
 }
-
 #infoBox {
   display: flex;
   gap: clamp(12px, 3vw, 20px);
@@ -221,21 +197,17 @@ button:disabled, button:disabled:hover {
   scrollbar-width: thin;
   scrollbar-color: var(--accent) rgba(10,10,30,0.7);
 }
-
 #infoBox::-webkit-scrollbar { width: 8px; }
 #infoBox::-webkit-scrollbar-thumb { background-color: var(--accent); border-radius: 4px; }
 #infoBox::-webkit-scrollbar-track { background: rgba(10,10,30,0.7); }
-
 #infoBox .infoColumn {
   flex: 1 1 45%;
   min-width: 180px;
 }
-
 #infoBox .infoColumn h3 {
   margin: 0 0 8px 0;
   color: var(--accent);
 }
-
 /* Loop Button */
 .loop-btn {
   width: clamp(34px, 8vw, 38px);
@@ -249,20 +221,17 @@ button:disabled, button:disabled:hover {
   cursor: pointer;
   transition: all 0.25s;
 }
-
 .loop-btn:hover:not(:disabled) {
   background: rgba(20,20,80,0.9);
   color: var(--accent);
   border-color: var(--accent-dark);
 }
-
 .loop-btn.active {
   color: #ffdd00;
   background: rgba(80,60,0,0.5);
   border-color: #ffdd00;
   box-shadow: 0 0 12px #ffdd00aa;
 }
-
 /* VISUALIZER */
 #visualizerOverlay {
   position: fixed;
@@ -275,11 +244,9 @@ button:disabled, button:disabled:hover {
   justify-content: center;
   z-index: 2000;
 }
-
 #visualizerOverlay.active {
   display: flex;
 }
-
 #visualizerCanvas {
   border-radius: 24px;
   box-shadow: 0 0 60px #00ffff88, 0 0 120px #9146ff55;
@@ -290,13 +257,11 @@ button:disabled, button:disabled:hover {
   height: auto;
   object-fit: contain;
 }
-
 /* Light Mode Overrides */
 [data-theme="light"] #overlay { background: var(--bg-light); }
 [data-theme="light"] header { background: rgba(255,255,255,0.75); }
 [data-theme="light"] body { color: var(--text-light); }
 [data-theme="light"] h1, [data-theme="light"] #currentSong { color: #1a1a40; text-shadow: 0 0 8px rgba(65,105,225,0.5); }
-
 /* Responsive Anpassungen für Android */
 @media (max-width: 768px) {
   header {
@@ -320,7 +285,7 @@ button:disabled, button:disabled:hover {
     font-size: 1.1rem;
   }
   #downloadBtn {
-    display: none; /* ← Download-Button auf Mobile komplett ausblenden */
+    display: none;
   }
   #volumeContainer {
     flex-direction: row;
@@ -342,14 +307,12 @@ button:disabled, button:disabled:hover {
     max-height: 55vh;
   }
 }
-
 @media (max-width: 480px) {
   h1 { font-size: 28px; }
   #infoText { font-size: 14px; }
   .viz-header h2 { font-size: 2rem; }
   .viz-mode-buttons { flex-direction: column; gap: 8px; }
 }
-
 @media (max-width: 360px) {
   header .logo-container span { font-size: 18px; }
   button, select { font-size: 1rem; padding: 12px; }
@@ -357,7 +320,6 @@ button:disabled, button:disabled:hover {
 </style>
 </head>
 <body>
-
 <header>
   <div class="logo-container">
     <img src="https://raw.githubusercontent.com/VenomSnakeTwitch/VenomSnake_Twitch-Webseite/main/DogVenomsnakeLogo.png" alt="VenomSnake Logo">
@@ -368,13 +330,11 @@ button:disabled, button:disabled:hover {
     <button id="themeBtn">🌙</button>
   </div>
 </header>
-
 <div id="overlay">
   <h1>VenomSnake_Twitch´s Musikplayer</h1>
   <div id="infoText">Hier lade ich meine Musik, die ich mit Suno.com erstellt habe, hoch. Diese kannst du dir anhören und herunterladen.</div>
   <h2 id="currentSong">▶ Kein Song ausgewählt</h2>
   <audio id="audioPlayer" crossorigin="anonymous"></audio>
-
   <div id="songControls">
     <select id="songSelect" onchange="selectSong()">
       <option value="0">Snake Eater VenomSnake_Twitch Mix</option>
@@ -415,14 +375,12 @@ button:disabled, button:disabled:hover {
       <span>Lautstärke</span>
     </div>
   </div>
-
   <div id="progressContainer">
     <span id="timeLabel">0:00</span>
     <input type="range" id="progress" min="0" max="100" value="0">
     <button id="loopBtn" type="button" title="Aktuellen Song wiederholen (nicht im Radio-Modus möglich)" class="loop-btn">🔁</button>
     <span id="durationLabel">0:00</span>
   </div>
-
   <div id="controls">
     <button onclick="prevSong()">⏮ Vorheriger</button>
     <button id="playPauseBtn" onclick="togglePlay()">▶ Play</button>
@@ -431,7 +389,6 @@ button:disabled, button:disabled:hover {
     <button onclick="toggleFullscreen()">Vollbild</button>
     <button id="radioToggle" onclick="toggleRadioMode()">🎧 Radio-Modus</button>
   </div>
-
   <div id="infoBox">
     <div class="infoColumn">
       <h3>Neue Songs Sind Da!</h3>
@@ -458,28 +415,23 @@ button:disabled, button:disabled:hover {
     </div>
   </div>
 </div>
-
 <!-- VISUALIZER OVERLAY -->
 <div id="visualizerOverlay">
   <div class="viz-header"><h2>VENOM VISUALIZER</h2></div>
   <button id="closeVisualizer" class="close-viz-btn">✕</button>
-
   <canvas id="visualizerCanvas"></canvas>
-
   <div class="viz-mode-buttons">
     <button class="mode-btn" data-mode="0">RING</button>
     <button class="mode-btn" data-mode="1">WAVE</button>
     <button class="mode-btn active" data-mode="2">BARS</button>
     <button class="mode-btn" data-mode="3">⚡ BLITZ</button>
   </div>
-
   <div id="vizControls">
     <button onclick="prevSong()" class="viz-btn">⏮</button>
     <button id="vizPlayPauseBtn" onclick="togglePlay()" class="viz-btn">▶</button>
     <button onclick="nextSong()" class="viz-btn">⏭</button>
     <select id="vizSongSelect" onchange="selectSongFromViz()" class="viz-select"></select>
   </div>
-
   <div id="vizVersion">Visualizer v4.5</div>
 </div>
 
@@ -568,6 +520,28 @@ let vizMode = 2;
 
 const logoImg = new Image();
 logoImg.src = "https://raw.githubusercontent.com/VenomSnakeTwitch/VenomSnake_Twitch-Webseite/main/DogVenomsnakeLogo.png";
+
+// Synchronisation des Lautstärke-Reglers mit System-Lautstärke (neu!)
+function syncVolumeSlider() {
+  if (audio.volume !== parseFloat(volumeSlider.value)) {
+    volumeSlider.value = audio.volume;
+  }
+}
+
+// Alle 300 ms prüfen (Hardware-Tasten feuern oft kein Event)
+setInterval(syncVolumeSlider, 300);
+
+// Zusätzliche Events für sofortige Aktualisierung
+audio.addEventListener('volumechange', syncVolumeSlider);
+audio.addEventListener('play', syncVolumeSlider);
+audio.addEventListener('pause', syncVolumeSlider);
+
+// Wenn die Seite wieder sichtbar wird (z. B. nach Hintergrund), syncen
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') {
+    syncVolumeSlider();
+  }
+});
 
 function initAudioContext() {
   if (audioContext) return;
@@ -680,7 +654,9 @@ progress.addEventListener("input", () => {
   if (audio.duration) audio.currentTime = (progress.value / 100) * audio.duration;
 });
 
-volumeSlider.addEventListener("input", () => audio.volume = volumeSlider.value);
+volumeSlider.addEventListener("input", () => {
+  audio.volume = volumeSlider.value;
+});
 
 function formatTime(time) {
   if (isNaN(time)) return "0:00";

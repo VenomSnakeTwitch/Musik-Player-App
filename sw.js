@@ -2,10 +2,9 @@ const CACHE_NAME = 'venomplayer-v1';
 const ASSETS = [
   '/',
   '/index.html',
-  '/manifest.webmanifest',
+  '/manifest.json',
   '/DogVenomsnakeLogo.png',
   '/musicbackground.png'
-  // Füge später Icons hinzu, KEINE MP3s!
 ];
 
 self.addEventListener('install', event => {
@@ -25,10 +24,15 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('fetch', event => {
-  if (event.request.url.endsWith('.mp3')) {
-    event.respondWith(fetch(event.request));
+  // MP3-Dateien direkt vom Server laden, da sie extern liegen
+  if (event.request.url.includes('.mp3')) {
+    event.respondWith(
+      fetch(event.request, { mode: 'cors' }) 
+    );
     return;
   }
+
+  // Alles andere aus dem Cache oder Netzwerk
   event.respondWith(
     caches.match(event.request).then(response => response || fetch(event.request))
   );

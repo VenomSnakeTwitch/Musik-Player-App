@@ -216,11 +216,6 @@ button:disabled, button:disabled:hover {
   cursor: pointer;
   transition: all 0.25s;
 }
-.loop-btn:hover:not(:disabled) {
-  background: rgba(20,20,80,0.9);
-  color: var(--accent);
-  border-color: var(--accent-dark);
-}
 .loop-btn.active {
   color: #ffdd00;
   background: rgba(80,60,0,0.5);
@@ -238,9 +233,7 @@ button:disabled, button:disabled:hover {
   justify-content: center;
   z-index: 2000;
 }
-#visualizerOverlay.active {
-  display: flex;
-}
+#visualizerOverlay.active { display: flex; }
 #visualizerCanvas {
   width: 100%;
   max-width: 100%;
@@ -270,11 +263,7 @@ button:disabled, button:disabled:hover {
   color: #00ffff;
   letter-spacing: 4px;
 }
-#vizHeaderControls {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-}
+#vizHeaderControls { display: flex; gap: 12px; align-items: center; }
 .viz-options-select {
   padding: 10px 18px;
   font-size: 1rem;
@@ -284,26 +273,12 @@ button:disabled, button:disabled:hover {
   border-radius: 10px;
   cursor: pointer;
   transition: all 0.3s ease;
-  text-shadow: 0 0 8px rgba(0,255,255,0.6);
-  box-shadow: 0 3px 12px rgba(0,0,0,0.4);
-  min-width: 150px;
-}
-.viz-options-select:hover {
-  background: linear-gradient(145deg, rgba(0,255,255,0.35), rgba(145,70,255,0.35));
-  border-color: #ffffff;
-  box-shadow: 0 6px 20px rgba(0,255,255,0.4);
 }
 #closeVisualizer {
-  position: static;
-  margin-left: 16px;
   background: linear-gradient(145deg, rgba(255,51,102,0.25), rgba(255,102,153,0.15));
   border: 1px solid #ff3366;
   padding: 10px 16px;
   font-size: 1.4rem;
-  z-index: 10;
-}
-#closeVisualizer:hover {
-  background: linear-gradient(145deg, rgba(255,51,102,0.45), rgba(255,102,153,0.35));
 }
 #vizControls {
   margin-top: 22px;
@@ -314,44 +289,24 @@ button:disabled, button:disabled:hover {
   padding: 12px 24px;
   border-radius: 16px;
   border: 2px solid rgba(0,255,255,0.3);
-  box-shadow: 0 0 40px rgba(0,255,255,0.2);
   flex-wrap: wrap;
   justify-content: center;
-  backdrop-filter: blur(10px);
 }
 .viz-btn {
   padding: 12px 20px;
   font-size: 1.3rem;
-  background: linear-gradient(145deg, rgba(0,255,255,0.15), rgba(145,70,255,0.15));
+  background: rgba(0,255,255,0.1);
   border: 1px solid rgba(0,255,255,0.5);
   color: #fff;
   border-radius: 12px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  min-width: 70px;
-  text-shadow: 0 0 8px rgba(0,255,255,0.6);
-  box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-}
-.viz-btn:hover:not(:disabled) {
-  background: linear-gradient(145deg, rgba(0,255,255,0.35), rgba(145,70,255,0.35));
-  border-color: #ffffff;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(0,255,255,0.4);
-}
-.viz-btn:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-  filter: grayscale(70%);
 }
 .viz-select {
   padding: 12px 20px;
-  font-size: 1rem;
   background: rgba(0,0,60,0.85);
-  border: 1px solid rgba(0,255,255,0.5);
   color: #fff;
   border-radius: 12px;
   min-width: 240px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
 }
 #vizVersion {
   position: absolute;
@@ -360,27 +315,6 @@ button:disabled, button:disabled:hover {
   font-size: 0.95rem;
   color: #88f0ff;
   opacity: 0.7;
-  text-shadow: 0 0 8px #00ffff, 0 0 14px #9146ff;
-  pointer-events: none;
-  letter-spacing: 1px;
-  font-weight: bold;
-  z-index: 10;
-}
-[data-theme="light"] #vizVersion {
-  color: #4169e1;
-  text-shadow: 0 0 6px #4169e1;
-  opacity: 0.8;
-}
-@media (max-width: 768px) {
-  #visualizerCanvas { max-height: 58vh; }
-  .viz-header { padding: 18px 18px 0 18px; }
-  #closeVisualizer { margin-left: 12px; padding: 8px 14px; font-size: 1.35rem; }
-  .viz-options-select { min-width: 135px; padding: 8px 14px; font-size: 0.95rem; }
-}
-@media (max-width: 480px) {
-  .viz-header { padding: 16px 16px 0 16px; }
-  #closeVisualizer { margin-left: 10px; padding: 7px 13px; font-size: 1.3rem; }
-  .viz-options-select { min-width: 120px; }
 }
 </style>
 </head>
@@ -397,7 +331,7 @@ button:disabled, button:disabled:hover {
 </header>
 <div id="overlay">
   <h1>VenomSnake_Twitch´s Musikplayer</h1>
-  <div id="infoText">Hier lade ich meine Musik, die ich mit Suno.com erstellt habe, hoch. Diese kannst du dir anhören und herunterladen.</div>
+  <div id="infoText">Hier lade ich meine Musik, die ich mit Suno.com erstellt habe, hoch.</div>
   <h2 id="currentSong">▶ Kein Song ausgewählt</h2>
   <audio id="audioPlayer" crossorigin="anonymous"></audio>
   <div id="songControls">
@@ -444,7 +378,7 @@ button:disabled, button:disabled:hover {
   <div id="progressContainer">
     <span id="timeLabel">0:00</span>
     <input type="range" id="progress" min="0" max="100" value="0">
-    <button id="loopBtn" type="button" title="Aktuellen Song wiederholen (nicht im Radio-Modus möglich)" class="loop-btn">🔁</button>
+    <button id="loopBtn" type="button" class="loop-btn">🔁</button>
     <span id="durationLabel">0:00</span>
   </div>
   <div id="controls">
@@ -452,33 +386,7 @@ button:disabled, button:disabled:hover {
     <button id="playPauseBtn" onclick="togglePlay()">▶ Play</button>
     <button onclick="stopSong()">⏹ Stop</button>
     <button onclick="nextSong()">⏭ Nächster</button>
-    <button onclick="toggleFullscreen()">Vollbild</button>
     <button id="radioToggle" onclick="toggleRadioMode()">🎧 Radio-Modus</button>
-  </div>
-  <div id="infoBox">
-    <div class="infoColumn">
-      <h3>Neue Songs Sind Da!</h3>
-      <p>Bleed out My Friend</p>
-      <p>Revenge</p>
-      <p>Revenge 2</p>
-      <p>Survival Of Death</p>
-      <p>Pile of Total Wreck</p>
-      <p>Industrial Breakdown</p>
-      <p>Mental Breakdown</p>
-      <p>Operation Stealth Destruction</p>
-      <p>Desert Storm Ahead</p>
-      <p>Metal Gear 2 Solid Snake Chasing the Green Beret Remix</p>
-      <p>Metal Gear 2 Solid Snake Frequency 140.85 Remix Version 2026</p>
-      <p>Metal Gear 2 Solid Snake Level1 Warning Remix</p>
-      <p>Metal Gear 2 Solid Snake Level3 Warning Remix</p>
-      <p>Metal Gear 2 Solid Snake Reprieve of The Doctor Remix</p>
-      <p>Takin' On The Shagohod Remake</p>
-      <p>Metal Gear 2 Solid Snake Frequency 140.85</p>
-    </div>
-    <div class="infoColumn">
-      <h3>Bald Erscheinende Songs</h3>
-      <p>Weitere Projekte in Planung...</p>
-    </div>
   </div>
 </div>
 
@@ -504,16 +412,10 @@ button:disabled, button:disabled:hover {
     <button onclick="nextSong()" class="viz-btn">⏭</button>
     <select id="vizSongSelect" onchange="selectSongFromViz()" class="viz-select"></select>
   </div>
-  <div id="vizVersion">Visualizer v4.5 – RING only</div>
+  <div id="vizVersion">Visualizer v4.5 – Adaptive RING</div>
 </div>
 
 <script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function() {
-    navigator.serviceWorker.register('/sw.js').catch(error => console.log('SW Error:', error));
-  });
-}
-
 const songs = [
   "Snake Eater VenomSnake_Twitch Mix.mp3", "Ghost Town by VenomSnake_Twitch.mp3", "Wreckfest.mp3",
   "In The Air Tonight(VenomSnake_Twitch).mp3", "Paradies City.mp3", "Parasitäres Bewustsein.mp3",
@@ -523,121 +425,23 @@ const songs = [
   "Resident Evil 5 Desperate Escape Main Theme Music(Remix).mp3", "Bleed out My Frend.mp3",
   "Revange.mp3", "Revange 2.mp3", "Survival Of Death.mp3", "Pile of Total Wreck.mp3",
   "Dessert Storm Ahead.mp3", "Industrial Breakdown.mp3", "Mental Breakdown.mp3",
-  "Metal Gear 2 Solid Snake Chasing the Green Beret Remix.mp3",
-  "Metal Gear 2 Solid Snake Freqency 140.85 Remix Version 2026.mp3",
+  "Metal Gear 2 Solid Snake Chasing the Green Beret Remix.mp3", "Metal Gear 2 Solid Snake Freqency 140.85 Remix Version 2026.mp3",
   "Metal Gear 2 Solid Snake Level1 Warning Remix.mp3", "Metal Gear 2 Solid Snake Level3 Warning Remix.mp3",
   "Metal Gear 2 Solid Snake Reprieve of The Doctor Remix.mp3", "Operation Stealth Destruction.mp3",
   "Takin' On The Shagohod Remake.mp3", "Metal Gear 2 Solid Snake Freqency 140.85.mp3"
 ];
 
 const BASE_URL = "https://raw.githubusercontent.com/VenomSnakeTwitch/VenomSnake_Twitch-Webseite/main/";
-let currentIndex = 0;
-let radioMode = false;
-let loopCurrent = false;
+let currentIndex = 0, radioMode = false, loopCurrent = false;
+const audio = document.getElementById("audioPlayer"), playPauseBtn = document.getElementById("playPauseBtn");
+const songSelect = document.getElementById("songSelect"), progress = document.getElementById("progress");
+const volumeSlider = document.getElementById("volumeSlider"), downloadBtn = document.getElementById("downloadBtn");
+const canvas = document.getElementById('visualizerCanvas'), ctx = canvas.getContext('2d');
+const visualizerOverlay = document.getElementById('visualizerOverlay'), vizPlayPauseBtn = document.getElementById('vizPlayPauseBtn');
 
-const audio = document.getElementById("audioPlayer");
-const playPauseBtn = document.getElementById("playPauseBtn");
-const songSelect = document.getElementById("songSelect");
-const progress = document.getElementById("progress");
-const timeLabel = document.getElementById("timeLabel");
-const durationLabel = document.getElementById("durationLabel");
-const volumeSlider = document.getElementById("volumeSlider");
-const downloadBtn = document.getElementById("downloadBtn");
-const loopBtn = document.getElementById("loopBtn");
-const radioToggle = document.getElementById("radioToggle");
-
-const visualizerOverlay = document.getElementById('visualizerOverlay');
-const visualizerBtn = document.getElementById('visualizerBtn');
-const closeVisualizer = document.getElementById('closeVisualizer');
-const canvas = document.getElementById('visualizerCanvas');
-const ctx = canvas.getContext('2d');
-const vizPlayPauseBtn = document.getElementById('vizPlayPauseBtn');
-const vizDownloadBtn = document.getElementById('vizDownloadBtn');
-const vizSongSelect = document.getElementById('vizSongSelect');
-const bgFileInput = document.getElementById('bgFileInput');
-const vizOptionsSelect = document.getElementById('vizOptionsSelect');
-const vizResetOption = document.getElementById('vizResetOption');
-
-let audioContext = null;
-let analyser = null;
-let bufferLength = 0;
-let dataArray = null;
-let fadeDataArray = null;
-let animationId = null;
-let source = null; // Fix für MediaElementSource Error
-
+let audioContext = null, analyser = null, bufferLength = 0, dataArray = null, fadeDataArray = null, animationId = null, source = null;
 const logoImg = new Image();
 logoImg.src = "https://raw.githubusercontent.com/VenomSnakeTwitch/VenomSnake_Twitch-Webseite/main/DogVenomsnakeLogo.png";
-
-bgFileInput.addEventListener('change', e => {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = event => {
-    const bgUrl = event.target.result;
-    canvas.style.backgroundImage = `url(${bgUrl})`;
-    canvas.style.backgroundSize = 'cover';
-    canvas.style.backgroundPosition = 'center';
-    localStorage.setItem('customVisualizerCanvasBg', bgUrl);
-    vizResetOption.style.display = 'block';
-  };
-  reader.readAsDataURL(file);
-});
-
-window.addEventListener('load', () => {
-  const savedBg = localStorage.getItem('customVisualizerCanvasBg');
-  if (savedBg) {
-    canvas.style.backgroundImage = `url(${savedBg})`;
-    canvas.style.backgroundSize = 'cover';
-    canvas.style.backgroundPosition = 'center';
-    vizResetOption.style.display = 'block';
-  }
-});
-
-function updateVizDownloadBtn() {
-  if (audio.src && !audio.paused && !audio.ended) {
-    vizDownloadBtn.disabled = false;
-    vizDownloadBtn.onclick = () => {
-      const a = document.createElement('a');
-      a.href = audio.src;
-      a.download = songs[currentIndex];
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    };
-  } else {
-    vizDownloadBtn.disabled = true;
-  }
-}
-
-function handleVizOption(value) {
-  if (!value) return;
-  if (value === 'fullscreen') {
-    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
-    else document.exitFullscreen();
-  } else if (value === 'background') {
-    bgFileInput.click();
-  } else if (value === 'reset') {
-    canvas.style.backgroundImage = '';
-    localStorage.removeItem('customVisualizerCanvasBg');
-    vizResetOption.style.display = 'none';
-  }
-}
-
-function syncVolumeSliderFromSystem() {
-  if (Math.abs(audio.volume - parseFloat(volumeSlider.value)) > 0.01) {
-    volumeSlider.value = audio.volume;
-  }
-}
-
-let volumePollingInterval = null;
-function startVolumePolling() {
-  if (volumePollingInterval) clearInterval(volumePollingInterval);
-  volumePollingInterval = setInterval(() => { if (!audio.paused) syncVolumeSliderFromSystem(); }, 150);
-}
-
-audio.addEventListener('play', startVolumePolling);
-volumeSlider.addEventListener('input', () => { audio.volume = parseFloat(volumeSlider.value); });
 
 function initAudioContext() {
   if (audioContext) return;
@@ -654,201 +458,98 @@ function initAudioContext() {
   }
 }
 
-function resumeAudioContext() {
+function togglePlay() {
   if (!audioContext) initAudioContext();
   if (audioContext.state === 'suspended') audioContext.resume();
-}
-
-function togglePlay() {
-  resumeAudioContext();
-  if (audio.paused || audio.ended) {
+  if (audio.paused) {
     audio.play().then(() => {
       playPauseBtn.textContent = "⏸ Pause";
       vizPlayPauseBtn.textContent = "⏸";
-      updateVizDownloadBtn();
-    }).catch(e => console.error("Play-Fehler:", e));
+    });
   } else {
     audio.pause();
     playPauseBtn.textContent = "▶ Play";
     vizPlayPauseBtn.textContent = "▶";
-    updateVizDownloadBtn();
   }
 }
 
 function loadSong(index) {
   currentIndex = index;
   const fileName = songs[index];
-  const url = BASE_URL + encodeURIComponent(fileName);
-  audio.src = url;
+  audio.src = BASE_URL + encodeURIComponent(fileName);
   songSelect.value = index;
-  if (vizSongSelect) vizSongSelect.value = index;
-  downloadBtn.href = url;
-  downloadBtn.setAttribute("download", fileName);
   document.getElementById("currentSong").textContent = "▶ " + songSelect.options[index].text;
-  updateVizDownloadBtn();
+  downloadBtn.href = audio.src;
 }
 
-function selectSong() { resumeAudioContext(); loadSong(parseInt(songSelect.value)); togglePlay(); }
-function selectSongFromViz() { resumeAudioContext(); loadSong(parseInt(vizSongSelect.value)); togglePlay(); }
-
-function nextSong() {
-  loadSong(radioMode ? Math.floor(Math.random() * songs.length) : (currentIndex + 1) % songs.length);
-  togglePlay();
-}
-
-function prevSong() {
-  if (radioMode) return;
-  loadSong((currentIndex - 1 + songs.length) % songs.length);
-  togglePlay();
-}
-
-function stopSong() {
-  audio.pause();
-  audio.currentTime = 0;
-  playPauseBtn.textContent = "▶ Play";
-  vizPlayPauseBtn.textContent = "▶";
-  updateVizDownloadBtn();
-}
-
-function toggleRadioMode() {
-  radioMode = !radioMode;
-  radioToggle.textContent = radioMode ? "🎧 Radio aus" : "🎧 Radio-Modus";
-  if (radioMode) nextSong();
-}
-
-function toggleFullscreen() {
-  if (!document.fullscreenElement) document.documentElement.requestFullscreen();
-  else document.exitFullscreen();
-}
-
-loopBtn.addEventListener("click", () => {
-  if (radioMode) return;
-  loopCurrent = !loopCurrent;
-  loopBtn.classList.toggle("active", loopCurrent);
-});
+function selectSong() { loadSong(parseInt(songSelect.value)); togglePlay(); }
+function nextSong() { loadSong(radioMode ? Math.floor(Math.random() * songs.length) : (currentIndex + 1) % songs.length); togglePlay(); }
+function prevSong() { if (!radioMode) { loadSong((currentIndex - 1 + songs.length) % songs.length); togglePlay(); } }
+function stopSong() { audio.pause(); audio.currentTime = 0; playPauseBtn.textContent = "▶ Play"; }
 
 audio.addEventListener("timeupdate", () => {
-  if (!audio.duration) return;
-  progress.value = (audio.currentTime / audio.duration) * 100;
-  timeLabel.textContent = formatTime(audio.currentTime);
-  durationLabel.textContent = formatTime(audio.duration);
+  if (audio.duration) progress.value = (audio.currentTime / audio.duration) * 100;
+  document.getElementById("timeLabel").textContent = formatTime(audio.currentTime);
+  document.getElementById("durationLabel").textContent = formatTime(audio.duration);
 });
 
-progress.addEventListener("input", () => {
-  if (audio.duration) audio.currentTime = (progress.value / 100) * audio.duration;
-});
-
-function formatTime(time) {
-  if (isNaN(time)) return "0:00";
-  const min = Math.floor(time / 60);
-  const sec = Math.floor(time % 60).toString().padStart(2, '0');
-  return min + ":" + sec;
+function formatTime(t) {
+  const m = Math.floor(t / 60), s = Math.floor(t % 60);
+  return m + ":" + (s < 10 ? "0" + s : s);
 }
 
-audio.addEventListener("ended", () => {
-  if (loopCurrent && !radioMode) { audio.currentTime = 0; audio.play(); } 
-  else { nextSong(); }
-});
-
-function toggleTheme() {
-  const next = (document.documentElement.getAttribute('data-theme') || 'dark') === 'dark' ? 'light' : 'dark';
-  document.documentElement.setAttribute('data-theme', next);
-  localStorage.setItem('playerTheme', next);
-  document.getElementById('themeBtn').textContent = next === 'light' ? '☀️' : '🌙';
-}
-
-function resizeCanvas() {
-  canvas.width = visualizerOverlay.clientWidth;
-  canvas.height = Math.floor(window.innerHeight * 0.62);
-}
+volumeSlider.addEventListener("input", () => audio.volume = volumeSlider.value);
+progress.addEventListener("input", () => audio.currentTime = (progress.value / 100) * audio.duration);
 
 function drawRing() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  const centerX = canvas.width / 2;
-  const centerY = canvas.height / 2;
-  const logoBase = Math.min(canvas.width, canvas.height) * 0.58;
+  const centerX = canvas.width / 2, centerY = canvas.height / 2;
+  const isPortrait = canvas.height > canvas.width;
+  const scaleFactor = isPortrait ? 0.40 : 0.55;
+  const logoSize = Math.min(canvas.width, canvas.height) * scaleFactor;
 
   if (logoImg.complete) {
     ctx.save();
-    ctx.shadowBlur = 50;
-    ctx.shadowColor = 'rgba(0,255,255,0.8)';
-    ctx.drawImage(logoImg, centerX - logoBase/2, centerY - logoBase/2, logoBase, logoBase);
+    ctx.shadowBlur = 50; ctx.shadowColor = 'rgba(0,255,255,0.8)';
+    ctx.drawImage(logoImg, centerX - logoSize/2, centerY - logoSize/2, logoSize, logoSize);
     ctx.restore();
   }
 
-  const ringRadius = logoBase * 0.68;
-  const ringThickness = 10 + Math.max(...fadeDataArray) / 255 * 8;
-
+  const ringRadius = logoSize * 0.70;
+  analyser.getByteFrequencyData(fadeDataArray);
+  
   ctx.beginPath();
   ctx.arc(centerX, centerY, ringRadius, 0, Math.PI * 2);
-  ctx.lineWidth = ringThickness;
-  ctx.strokeStyle = `hsla(200, 100%, 70%, 0.55)`;
-  ctx.shadowBlur = 45;
-  ctx.shadowColor = `rgba(0, 255, 255, 0.8)`;
+  ctx.lineWidth = 8; ctx.strokeStyle = "rgba(0, 255, 255, 0.5)";
   ctx.stroke();
 
-  const rayCount = 120;
-  for (let i = 0; i < rayCount; i++) {
-    const angle = (i / rayCount) * Math.PI * 2;
-    const freqIndex = Math.floor((Math.min(i, rayCount - 1 - i) / rayCount) * bufferLength);
-    const amp = fadeDataArray[freqIndex] / 255;
-    const rayLength = amp * (ringRadius * 0.70);
-
-    const innerX = centerX + Math.cos(angle) * ringRadius;
-    const innerY = centerY + Math.sin(angle) * ringRadius;
-    const outerX = centerX + Math.cos(angle) * (ringRadius + rayLength);
-    const outerY = centerY + Math.sin(angle) * (ringRadius + rayLength);
-
-    const hue = 225 + (i * 1.8 % 28) - 14;
-    ctx.strokeStyle = `hsla(${hue}, 98%, ${36 + amp * 34}%, ${0.78 + amp * 0.22})`;
-    ctx.lineWidth = 3 + amp * 10;
-    ctx.shadowBlur = 25 + amp * 45;
-    ctx.shadowColor = `hsla(${hue}, 100%, 68%, 0.88)`;
-
+  for (let i = 0; i < 120; i++) {
+    const angle = (i / 120) * Math.PI * 2;
+    const amp = fadeDataArray[Math.floor((Math.min(i, 119 - i) / 120) * bufferLength)] / 255;
+    const rayLength = amp * (ringRadius * (isPortrait ? 0.5 : 0.7));
     ctx.beginPath();
-    ctx.moveTo(innerX, innerY);
-    ctx.lineTo(outerX, outerY);
+    ctx.moveTo(centerX + Math.cos(angle) * ringRadius, centerY + Math.sin(angle) * ringRadius);
+    ctx.lineTo(centerX + Math.cos(angle) * (ringRadius + rayLength), centerY + Math.sin(angle) * (ringRadius + rayLength));
+    ctx.strokeStyle = `hsla(${225 + (i * 2 % 30)}, 100%, 70%, 0.8)`;
     ctx.stroke();
   }
+  animationId = requestAnimationFrame(drawRing);
 }
 
-function drawVisualizer() {
-  animationId = requestAnimationFrame(drawVisualizer);
-  if (audio.paused || audio.ended || audio.currentTime === 0) {
-    for (let i = 0; i < bufferLength; i++) fadeDataArray[i] *= 0.94;
-  } else {
-    analyser.getByteFrequencyData(fadeDataArray);
-  }
+document.getElementById("visualizerBtn").addEventListener("click", () => {
+  visualizerOverlay.style.display = "flex";
+  canvas.width = visualizerOverlay.clientWidth;
+  canvas.height = window.innerHeight * 0.6;
+  if (!audioContext) initAudioContext();
   drawRing();
-}
-
-visualizerBtn.addEventListener('click', () => {
-  resumeAudioContext();
-  if (audio.paused) togglePlay();
-  visualizerOverlay.classList.add('active');
-  vizSongSelect.innerHTML = songSelect.innerHTML;
-  vizSongSelect.value = currentIndex;
-  resizeCanvas();
-  if (!animationId) drawVisualizer();
 });
 
-closeVisualizer.addEventListener('click', () => {
-  visualizerOverlay.classList.remove('active');
-  if (animationId) { cancelAnimationFrame(animationId); animationId = null; }
+document.getElementById("closeVisualizer").addEventListener("click", () => {
+  visualizerOverlay.style.display = "none";
+  cancelAnimationFrame(animationId);
 });
 
-window.addEventListener('load', () => {
-  const saved = localStorage.getItem('playerTheme');
-  if (saved) {
-    document.documentElement.setAttribute('data-theme', saved);
-    document.getElementById('themeBtn').textContent = saved === 'light' ? '☀️' : '🌙';
-  }
-  loadSong(0);
-  volumeSlider.value = 0.5;
-  document.getElementById('themeBtn').onclick = toggleTheme;
-});
-
-window.addEventListener('resize', () => { if (visualizerOverlay.classList.contains('active')) resizeCanvas(); });
+window.addEventListener("load", () => { loadSong(0); });
 </script>
 </body>
 </html>
